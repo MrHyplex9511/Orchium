@@ -70,6 +70,8 @@ function parse(tip: string): TipPart[] {
 
 const NO_MODELS_TIP = "Run {highlight}/connect{/highlight} to add an AI provider and start coding"
 const NO_MODELS_PARTS = parse(NO_MODELS_TIP)
+const EASTER_EGG_TIP = "Also try {highlight}OpenCode{/highlight}!"
+const EASTER_EGG_CHANCE = 0.02
 
 function shortcutText(value: string) {
   return `{highlight}${value}{/highlight}`
@@ -138,6 +140,7 @@ export function Tips(props: { api: TuiPluginApi; connected?: boolean }) {
       const value = typeof item === "string" ? item : item(shortcuts)
       return value ? [value] : []
     })
+    if (Math.random() < EASTER_EGG_CHANCE) return EASTER_EGG_TIP
     return tips[Math.floor(tipOffset * tips.length)] ?? NO_MODELS_TIP
   }, NO_MODELS_TIP)
   // Solid can expose a memo's initial value while a pure computation is pending.
@@ -167,7 +170,7 @@ const TIPS: Tip[] = [
   (shortcuts) => press(shortcuts.agentCycle(), "to cycle between Build and Plan agents"),
   "Use {highlight}/undo{/highlight} to revert the last message and file changes",
   "Use {highlight}/redo{/highlight} to restore previously undone messages and file changes",
-  "Run {highlight}/share{/highlight} to create a public opencode.ai link",
+  "Run {highlight}/share{/highlight} to create a public link to this session",
   "Drag and drop images or PDFs into the terminal as context",
   (shortcuts) => press(shortcuts.inputPaste(), "to paste images from your clipboard into the prompt"),
   (shortcuts) => `Use ${commandText("/editor", shortcuts.editorOpen())} to compose messages in your external editor`,
@@ -182,7 +185,7 @@ const TIPS: Tip[] = [
       ? `Use ${shortcutText(shortcuts.sessionQuickSwitch1())} through ${shortcutText(shortcuts.sessionQuickSwitch9())} to switch pinned sessions`
       : undefined,
   "Run {highlight}/compact{/highlight} to summarize long sessions near context limits",
-  (shortcuts) => `Use ${commandText("/export", shortcuts.sessionExport())} to save the conversation as Markdown`,
+  (shortcuts) => `Use ${commandText("/export", shortcuts.sessionExport())} to save the conversation, or {highlight}orchium export --all{/highlight} to back up every session`,
   (shortcuts) => press(shortcuts.messagesCopy(), "to copy the assistant's last message to clipboard"),
   (shortcuts) => press(shortcuts.commandList(), "to see all available actions and commands"),
   "Run {highlight}/connect{/highlight} to add API keys for 75+ supported LLM providers",
@@ -241,7 +244,7 @@ const TIPS: Tip[] = [
   "Run {highlight}orchium serve{/highlight} for headless API access to Orchium",
   "Use {highlight}orchium run --attach{/highlight} to connect to a running server",
   "Run {highlight}orchium upgrade{/highlight} to update to the latest version",
-  "Run {highlight}orchium auth list{/highlight} to see all configured providers",
+  "Run {highlight}orchium account orgs{/highlight} to see all connected provider accounts",
   "Run {highlight}orchium agent create{/highlight} for guided agent creation",
   "Use {highlight}/orchium{/highlight} in GitHub issues/PRs to trigger AI actions",
   "Run {highlight}orchium github install{/highlight} to set up the GitHub workflow",
@@ -274,8 +277,9 @@ const TIPS: Tip[] = [
     shortcuts.commandList()
       ? `Toggle username display in chat via the command palette (${shortcutText(shortcuts.commandList())})`
       : "Toggle username display in chat via the command palette",
-  "Run {highlight}docker run -it --rm ghcr.io/anomalyco/opencode{/highlight} in a container",
-  "Use {highlight}/connect{/highlight} with Orchium Zen for curated, tested models",
+  "Back up all sessions with {highlight}orchium export --all --format markdown --sanitize{/highlight}",
+"Restore a session with {highlight}orchium import <file|url>{/highlight} from an exported JSON or share link",
+  "Use {highlight}/connect{/highlight} to log in with any provider and pick curated models",
   "Commit your project's {highlight}AGENTS.md{/highlight} file to Git for team sharing",
   "Use {highlight}/review{/highlight} to review uncommitted changes, branches, or PRs",
   (shortcuts) => `Use ${commandText("/help", shortcuts.helpShow())} to show the help dialog`,
