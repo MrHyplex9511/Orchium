@@ -6,7 +6,9 @@ import { effectCmd, fail } from "../effect-cmd"
 import { UI } from "../ui"
 import * as prompts from "@clack/prompts"
 import { EOL } from "os"
-import { Effect } from "effect"
+import fs from "fs/promises"
+import path from "path"
+import { Cause, Effect } from "effect"
 
 function redact(kind: string, id: string, value: string) {
   return value.trim() ? `[redacted:${kind}:${id}]` : value
@@ -219,13 +221,151 @@ function sanitize(data: { info: Session.Info; messages: SessionV1.WithParts[] })
   }
 }
 
+function dateStamp() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function truncate(text: string, max = 200) {
+  if (text.length <= max) return text
+  return `${text.slice(0, max).trimEnd()}…`
+}
+
+function markdownPart(part: SessionV1.Part): string | undefined {
+  switch (part.type) {
+    case "text":
+      return part.text
+    case "reasoning":
+      return part.text.trim() ? part.text.split("\n").map((line) => `> ${line}`).join("\n") : undefined
+    case "tool": {
+      const label = `\`${part.tool}\``
+      const state = part.state
+      if (state.status === "completed") {
+        const output = truncate(state.output.replace(/\s+/g, " ").trim())
+        const title = state.title ? `: ${state.title}` : ""
+        return output ? `${label} (completed)${title}\n\n\`\`\`\n${output}\n\`\`\`` : `${label} (completed)${title}`
+      }
+      if (state.status === "error") return `${label} (error): ${truncate(state.error)}`
+      return `${label} (${state.status})`
+    }
+    case "file":
+      return `file: ${part.filename ?? part.url}`
+    case "patch":
+      return `patch: ${part.files.length} file${part.files.length === 1 ? "" : "s"}`
+    case "subtask":
+      return `subtask: ${part.description}`
+    case "snapshot":
+      return `snapshot`
+    case "step-start":
+      return `step-start`
+    case "step-finish":
+      return `step-finish`
+    case "agent":
+      return `agent: ${part.name}`
+    case "retry":
+      return `retry: attempt ${part.attempt}`
+    case "compaction":
+      return `compaction${part.auto ? "" : " (manual)"}`
+    default:
+      return undefined
+  }
+}
+
+// Structural view of an exported session that both raw and sanitized data satisfy.
+type MarkdownSession = {
+  info: {
+    title: string
+    id: string
+    directory: string
+    agent?: string
+    model?: { id: string }
+    time: { created: number; updated: number }
+  }
+  messages: { info: { role: string; time: { created: number } }; parts: SessionV1.Part[] }[]
+}
+
+function renderMarkdown(data: MarkdownSession) {
+  const info = data.info
+  const lines = [
+    `# ${info.title}`,
+    "",
+    `- **id**: \`${info.id}\``,
+    `- **directory**: \`${info.directory}\``,
+    `- **created**: ${new Date(info.time.created).toISOString()}`,
+    `- **updated**: ${new Date(info.time.updated).toISOString()}`,
+  ]
+  if (info.agent) lines.push(`- **agent**: ${info.agent}`)
+  if (info.model) lines.push(`- **model**: ${info.model.id}`)
+  lines.push("", "## Messages", "")
+  for (const msg of data.messages) {
+    lines.push(`### ${msg.info.role} — ${new Date(msg.info.time.created).toISOString()}`, "")
+    for (const part of msg.parts) {
+      const body = markdownPart(part)
+      if (body) {
+        lines.push(body, "")
+      }
+    }
+  }
+  return lines.join(EOL)
+}
+
+type Exported = { id: string; title: string; updated: number; directory: string; file: string }
+type Failed = { id: string; error: string }
+
+function renderIndexJson(exported: Exported[], format: string) {
+  return {
+    exportedAt: new Date().toISOString(),
+    format,
+    count: exported.length,
+    sessions: exported.map((entry) => ({ ...entry })),
+  }
+}
+
+function renderIndexMarkdown(exported: Exported[], outputDir: string) {
+  const lines = [
+    "# Orchium Session Export",
+    "",
+    `Exported ${exported.length} session${exported.length === 1 ? "" : "s"} on ${dateStamp()} into \`${outputDir}\`.`,
+    "",
+  ]
+  if (exported.length === 0) lines.push("No sessions found.")
+  for (const [i, entry] of exported.entries()) {
+    lines.push(`${i + 1}. **${entry.title}** (\`${entry.id}\`)`)
+    lines.push(`   - directory: \`${entry.directory}\``)
+    lines.push(`   - updated: ${new Date(entry.updated).toISOString()}`)
+    lines.push(`   - file: \`${entry.file}\``)
+    lines.push("")
+  }
+  return lines.join(EOL)
+}
+
+type ExportArgs = {
+  sessionID?: string
+  sanitize?: boolean
+  all?: boolean
+  format?: "json" | "markdown"
+  output?: string
+}
+
 export const ExportCommand = effectCmd({
   command: "export [sessionID]",
-  describe: "export session data as JSON",
+  describe: "export session data as JSON or Markdown",
   builder: (yargs) =>
     yargs
       .positional("sessionID", {
         describe: "session id to export",
+        type: "string",
+      })
+      .option("all", {
+        describe: "export every session into per-session files in a directory",
+        type: "boolean",
+      })
+      .option("format", {
+        describe: "output format",
+        choices: ["json", "markdown"],
+        default: "json",
+      })
+      .option("output", {
+        describe: "directory to write --all exports (default ./orchium-export-<date>)",
         type: "string",
       })
       .option("sanitize", {
@@ -237,7 +377,81 @@ export const ExportCommand = effectCmd({
   }),
 })
 
-const run = Effect.fn("Cli.export.body")(function* (args: { sessionID?: string; sanitize?: boolean }) {
+export const exportAll = Effect.fn("Cli.export.all")(function* (args: ExportArgs) {
+  const svc = yield* Session.Service
+  const format = args.format ?? "json"
+  const outputDir = args.output ?? `./orchium-export-${dateStamp()}`
+  const ext = format === "markdown" ? "md" : "json"
+
+  process.stderr.write(`Exporting all sessions to ${outputDir} (${format})\n`)
+
+  const sessions = yield* svc
+    .list()
+    .pipe(Effect.catchCause((cause) => fail(`Failed to list sessions: ${Cause.pretty(cause)}`)))
+  sessions.sort((a, b) => b.time.updated - a.time.updated)
+
+  if (sessions.length === 0) {
+    process.stderr.write("No sessions found\n")
+  }
+
+  yield* Effect.promise(() => fs.mkdir(outputDir, { recursive: true })).pipe(
+    Effect.catchCause((cause) =>
+      fail(`Failed to create export directory ${outputDir}: ${Cause.pretty(cause)}`),
+    ),
+  )
+
+  const exported: Exported[] = []
+  const failed: Failed[] = []
+
+  for (const session of sessions) {
+    const outcome = yield* Effect.gen(function* () {
+      const info = yield* svc.get(session.id)
+      const messages = yield* svc.messages({ sessionID: session.id })
+      const exportData = { info, messages }
+      const applied = args.sanitize ? sanitize(exportData) : exportData
+      const body = format === "markdown" ? renderMarkdown(applied) : JSON.stringify(applied, null, 2)
+      const file = `${session.id}.${ext}`
+      yield* Effect.promise(() => Bun.write(path.join(outputDir, file), body + EOL))
+      return {
+        id: session.id,
+        title: args.sanitize ? redact("session-title", session.id, info.title) : info.title,
+        directory: args.sanitize ? redact("session-directory", session.id, info.directory) : info.directory,
+        updated: info.time.updated,
+        file,
+      }
+    }).pipe(
+      Effect.catchCause((cause) => Effect.succeed({ id: session.id, error: Cause.pretty(cause) })),
+    )
+
+    if ("error" in outcome) {
+      failed.push(outcome)
+      process.stderr.write(`Failed to export ${outcome.id}: ${outcome.error}\n`)
+    } else {
+      exported.push(outcome)
+      process.stderr.write(`Exported ${outcome.id} (${outcome.title})\n`)
+    }
+  }
+
+  const indexBody =
+    format === "markdown"
+      ? renderIndexMarkdown(exported, outputDir)
+      : JSON.stringify(renderIndexJson(exported, format), null, 2)
+  yield* Effect.promise(() => Bun.write(path.join(outputDir, `index.${ext}`), indexBody + EOL))
+
+  if (failed.length > 0) {
+    process.stderr.write(`Export finished: ${exported.length} exported, ${failed.length} failed\n`)
+  }
+
+  if (failed.length === sessions.length && sessions.length > 0) {
+    return yield* fail(`All ${sessions.length} sessions failed to export`)
+  }
+})
+
+const run = Effect.fn("Cli.export.body")(function* (args: ExportArgs) {
+  if (args.all) {
+    return yield* exportAll(args)
+  }
+
   const svc = yield* Session.Service
   let sessionID = args.sessionID ? SessionID.make(args.sessionID) : undefined
   process.stderr.write(`Exporting session: ${sessionID ?? "latest"}\n`)
@@ -285,8 +499,10 @@ const run = Effect.fn("Cli.export.body")(function* (args: { sessionID?: string; 
     const messages = yield* svc.messages({ sessionID: sessionInfo.id })
 
     const exportData = { info: sessionInfo, messages }
+    const applied = args.sanitize ? sanitize(exportData) : exportData
+    const body = args.format === "markdown" ? renderMarkdown(applied) : JSON.stringify(applied, null, 2)
 
-    process.stdout.write(JSON.stringify(args.sanitize ? sanitize(exportData) : exportData, null, 2))
+    process.stdout.write(body)
     process.stdout.write(EOL)
   }).pipe(Effect.catchCause(() => fail(`Session not found: ${sessionID!}`)))
 })
