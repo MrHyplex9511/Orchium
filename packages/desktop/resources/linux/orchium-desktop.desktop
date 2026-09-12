@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Orchium
+Exec=/opt/Orchium/ai.orchium.desktop %U
+Terminal=false
+Type=Application
+Icon=ai.orchium.desktop
+StartupWMClass=ai.orchium.desktop
+NoDisplay=true
+Comment=Open source AI coding agent
+Categories=Development;

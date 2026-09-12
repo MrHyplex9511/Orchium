@@ -1,0 +1,36 @@
+{
+  "$schema": "https://v2-8-13.turborepo.dev/schema.json",
+  "globalEnv": ["CI", "ORCHIUM_DISABLE_SHARE"],
+  "globalPassThroughEnv": ["CI", "ORCHIUM_DISABLE_SHARE"],
+  "tasks": {
+    "typecheck": {},
+    "build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"]
+    },
+    "orchium#test": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "passThroughEnv": ["*"]
+    },
+    "@orchium/core#test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "@orchium/function#test": {
+      "outputs": []
+    },
+    "@orchium/app#test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "@orchium/ui#test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "@orchium/session-ui#test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    }
+  }
+}

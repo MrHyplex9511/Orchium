@@ -1,0 +1,78 @@
+---
+title: Экосистема
+description: Проекты и интеграции, созданные с помощью Orchium.
+---
+
+Коллекция проектов сообщества, построенных на Orchium.
+
+:::note
+Хотите добавить свой проект, связанный с Orchium, в этот список? Разместите PR.
+:::
+
+Вы также можете посетить [awesome-orchium](https://github.com/awesome-orchium/awesome-orchium) и [orchium.cafe](https://orchium.cafe) — хаб, объединяющий экосистему и сообщество.
+
+---
+
+## Плагины
+
+| Имя                                                                                                | Описание                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [orchium-daytona](https://github.com/daytonaio/daytona/tree/main/libs/orchium-plugin)            | Автоматически запускайте сеансы Orchium в изолированных песочницах Daytona с синхронизацией git и предварительным просмотром в реальном времени |
+| [orchium-helicone-session](https://github.com/H2Shami/orchium-helicone-session)                  | Автоматически внедрять заголовки сеансов Helicone для группировки запросов                                                                       |
+| [orchium-type-inject](https://github.com/nick-vi/orchium-type-inject)                            | Автоматическое внедрение типов TypeScript/Svelte в файлы, считываемые с помощью инструментов поиска                                              |
+| [orchium-openai-codex-auth](https://github.com/numman-ali/orchium-openai-codex-auth)             | Используйте подписку ChatGPT Plus/Pro вместо кредитов API                                                                                        |
+| [orchium-gemini-auth](https://github.com/jenslys/orchium-gemini-auth)                            | Используйте существующий план Gemini вместо выставления счетов через API                                                                         |
+| [orchium-antigravity-auth](https://github.com/NoeFabris/orchium-antigravity-auth)                | Используйте бесплатные модели Antigravity вместо выставления счетов через API                                                                    |
+| [orchium-devcontainers](https://github.com/athal7/orchium-devcontainers)                         | Многоветвевая изоляция контейнеров разработки с мелкими клонами и автоматическим назначением портов                                              |
+| [orchium-google-antigravity-auth](https://github.com/shekohex/orchium-google-antigravity-auth)   | Плагин Google Antigravity OAuth с поддержкой поиска Google и более надежной обработкой API                                                       |
+| [orchium-dynamic-context-pruning](https://github.com/Tarquinen/orchium-dynamic-context-pruning)  | Оптимизируйте использование токенов за счет сокращения выходных данных устаревших инструментов                                                   |
+| [orchium-vibeguard](https://github.com/inkdust2021/orchium-vibeguard)                            | Скрывайте секреты/PII, заменяя их плейсхолдерами в стиле VibeGuard перед отправкой в LLM; восстанавливайте локально                              |
+| [orchium-websearch-cited](https://github.com/ghoulr/orchium-websearch-cited.git)                 | Добавьте встроенную поддержку веб-поиска для поддерживаемых поставщиков в стиле Google                                                           |
+| [orchium-pty](https://github.com/shekohex/orchium-pty.git)                                       | Позволяет агентам ИИ запускать фоновые процессы в PTY и отправлять им интерактивные данные                                                       |
+| [orchium-shell-strategy](https://github.com/JRedeker/orchium-shell-strategy)                     | Инструкции для неинтерактивных shell-команд — предотвращают зависания из-за операций, зависящих от TTY                                           |
+| [orchium-wakatime](https://github.com/angristan/orchium-wakatime)                                | Отслеживайте использование Orchium с помощью Wakatime                                                                                           |
+| [orchium-md-table-formatter](https://github.com/franlol/orchium-md-table-formatter/tree/main)    | Очистка таблиц Markdown, созданных LLM                                                                                                           |
+| [orchium-morph-plugin](https://github.com/morphllm/orchium-morph-plugin)                         | Редактирование Fast Apply, поиск по кодовой базе WarpGrep и сжатие контекста через Morph                                                         |
+| [oh-my-orchium](https://github.com/code-yeongyu/oh-my-orchium)                                   | Фоновые агенты, встроенные инструменты LSP/AST/MCP, курируемые агенты, совместимость с Claude Code                                               |
+| [orchium-notificator](https://github.com/panta82/orchium-notificator)                            | Уведомления на рабочем столе и звуковые оповещения для сеансов Orchium                                                                          |
+| [orchium-notifier](https://github.com/mohak34/orchium-notifier)                                  | Уведомления на рабочем столе и звуковые оповещения о разрешениях, завершении и событиях ошибок                                                   |
+| [orchium-zellij-namer](https://github.com/24601/orchium-zellij-namer)                            | Автоматическое именование сеансов Zellij на основе искусственного интеллекта на основе контекста Orchium                                        |
+| [orchium-skillful](https://github.com/zenobi-us/orchium-skillful)                                | Разрешить агентам Orchium отложенную загрузку подсказок по требованию с обнаружением и внедрением навыков                                       |
+| [orchium-supermemory](https://github.com/supermemoryai/orchium-supermemory)                      | Постоянная память между сеансами с использованием Supermemory                                                                                    |
+| [@plannotator/orchium](https://github.com/backnotprop/plannotator/tree/main/apps/orchium-plugin) | Интерактивный обзор плана с визуальными аннотациями и возможностью совместного использования в частном или автономном режиме                     |
+| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | Расширьте orchium/команды до мощной системы оркестровки с детальным управлением потоком данных                                                  |
+| [orchium-scheduler](https://github.com/different-ai/orchium-scheduler)                           | Планируйте повторяющиеся задания с помощью launchd (Mac) или systemd (Linux) с синтаксисом cron                                                  |
+| [micode](https://github.com/vtemian/micode)                                                        | Структурированный мозговой штурм → План → Реализация рабочего процесса с непрерывностью сеанса                                                   |
+| [octto](https://github.com/vtemian/octto)                                                          | Интерактивный пользовательский интерфейс браузера для мозгового штурма с помощью искусственного интеллекта с формами из нескольких вопросов      |
+| [orchium-background-agents](https://github.com/kdcokenny/orchium-background-agents)              | Фоновые агенты в стиле Claude Code с асинхронным делегированием и сохранением контекста                                                          |
+| [orchium-notify](https://github.com/kdcokenny/orchium-notify)                                    | Встроенные уведомления ОС для Orchium – узнайте, когда задачи завершены                                                                         |
+| [orchium-workspace](https://github.com/kdcokenny/orchium-workspace)                              | Комплексный пакет многоагентной оркестровки — 16 компонентов, одна установка                                                                     |
+| [orchium-worktree](https://github.com/kdcokenny/orchium-worktree)                                | Рабочие деревья git с нулевым трением для Orchium                                                                                               |
+| [orchium-sentry-monitor](https://github.com/stolinski/orchium-sentry-monitor)                    | Отслеживайте и отлаживайте ваших ИИ-агентов с помощью Sentry AI Monitoring                                                                       |
+
+---
+
+## Проекты
+
+| Имя                                                                                        | Описание                                                                                      |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| [kimaki](https://github.com/remorses/kimaki)                                               | Discord-бот для управления сеансами Orchium, созданный на базе SDK                           |
+| [orchium.nvim](https://github.com/NickvanDyke/orchium.nvim)                              | Плагин Neovim для подсказок с поддержкой редактора, созданный на основе API                   |
+| [portal](https://github.com/hosenur/portal)                                                | Мобильный веб-интерфейс для Orchium через Tailscale/VPN                                      |
+| [orchium plugin template](https://github.com/zenobi-us/orchium-plugin-template/)         | Шаблон для создания плагинов Orchium                                                         |
+| [orchium.nvim](https://github.com/sudo-tee/orchium.nvim)                                 | Интерфейс Neovim для Orchium - агент кодирования искусственного интеллекта на базе терминала |
+| [ai-sdk-provider-orchium-sdk](https://github.com/ben-vargas/ai-sdk-provider-orchium-sdk) | Поставщик Vercel AI SDK для использования Orchium через @orchium/sdk                     |
+| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | Веб-приложение или настольное приложение и расширение VS Code для Orchium                    |
+| [Orchium-Obsidian](https://github.com/mtymek/orchium-obsidian)                           | Плагин Obsidian, встраивающий Orchium в пользовательский интерфейс Obsidian                  |
+| [OpenWork](https://github.com/different-ai/openwork)                                       | Альтернатива Claude Cowork с открытым исходным кодом на базе Orchium                         |
+| [ocx](https://github.com/kdcokenny/ocx)                                                    | Менеджер расширений Orchium с переносимыми изолированными профилями                          |
+| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | Настольное, веб-, мобильное и удаленное клиентское приложение для Orchium                    |
+
+---
+
+## Агенты
+
+| Имя                                                               | Описание                                                                  |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Agentic](https://github.com/Cluster444/agentic)                  | Модульные ИИ-агенты и команды для структурированной разработки            |
+| [orchium-agents](https://github.com/darrenhinde/orchium-agents) | Конфигурации, подсказки, агенты и плагины для улучшения рабочих процессов |

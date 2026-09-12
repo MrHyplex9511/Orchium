@@ -1,0 +1,616 @@
+---
+title: CLI
+description: Opções e comandos da CLI do orchium.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components"
+
+A CLI do orchium, por padrão, inicia o [TUI](/docs/tui) quando executada sem argumentos.
+
+```bash
+orchium
+```
+
+Mas também aceita comandos conforme documentado nesta página. Isso permite que você interaja com o orchium programaticamente.
+
+```bash
+orchium run "Explain how closures work in JavaScript"
+```
+
+---
+
+### tui
+
+Inicie a interface de usuário do terminal do orchium.
+
+```bash
+orchium [project]
+```
+
+#### Opções
+
+| Flag                                     | Curto | Descrição                                                                  |
+| ---------------------------------------- | ----- | -------------------------------------------------------------------------- |
+| <nobr><code>{"--continue"}</code></nobr> | `-c`  | Continue a última sessão                                                   |
+| <nobr><code>{"--session"}</code></nobr>  | `-s`  | ID da sessão para continuar                                                |
+| <nobr><code>{"--fork"}</code></nobr>     |       | Criar um fork da sessão ao continuar (use com `--continue` ou `--session`) |
+| <nobr><code>{"--prompt"}</code></nobr>   |       | Prompt a ser usado                                                         |
+| <nobr><code>{"--model"}</code></nobr>    | `-m`  | Modelo a ser usado na forma de provider/model                              |
+| <nobr><code>{"--agent"}</code></nobr>    |       | Agente a ser usado                                                         |
+| <nobr><code>{"--port"}</code></nobr>     |       | Porta para escutar                                                         |
+| <nobr><code>{"--hostname"}</code></nobr> |       | Nome do host para escutar                                                  |
+
+---
+
+## Comandos
+
+A CLI do orchium também possui os seguintes comandos.
+
+---
+
+### agent
+
+Gerencie agentes para o orchium.
+
+```bash
+orchium agent [command]
+```
+
+---
+
+### attach
+
+Anexe um terminal a um servidor backend do orchium já em execução, iniciado via comandos `serve` ou `web`.
+
+```bash
+orchium attach [url]
+```
+
+Isso permite usar o TUI com um backend orchium remoto. Por exemplo:
+
+```bash
+# Inicie o servidor backend para acesso web/mobile
+orchium web --port 4096 --hostname 0.0.0.0
+
+# Em outro terminal, anexe o TUI ao backend em execução
+orchium attach http://10.20.30.40:4096
+```
+
+#### Opções
+
+| Flag                                     | Curto | Descrição                                                                         |
+| ---------------------------------------- | ----- | --------------------------------------------------------------------------------- |
+| <nobr><code>{"--dir"}</code></nobr>      |       | Diretório de trabalho para iniciar o TUI                                          |
+| <nobr><code>{"--continue"}</code></nobr> | `-c`  | Continuar a última sessão                                                         |
+| <nobr><code>{"--session"}</code></nobr>  | `-s`  | ID da sessão para continuar                                                       |
+| <nobr><code>{"--fork"}</code></nobr>     |       | Bifurcar a sessão ao continuar (use com `--continue` ou `--session`)              |
+| <nobr><code>{"--password"}</code></nobr> | `-p`  | Senha de autenticação básica (padrão: `ORCHIUM_SERVER_PASSWORD`)                 |
+| <nobr><code>{"--username"}</code></nobr> | `-u`  | Usuário de autenticação básica (padrão: `ORCHIUM_SERVER_USERNAME` ou `orchium`) |
+
+---
+
+#### create
+
+Crie um novo agente com configuração personalizada.
+
+```bash
+orchium agent create
+```
+
+Este comando irá guiá-lo na criação de um novo agente com um prompt de sistema personalizado e configuração de ferramentas.
+
+---
+
+#### list
+
+Liste todos os agentes disponíveis.
+
+```bash
+orchium agent list
+```
+
+---
+
+### auth
+
+Comando para gerenciar credenciais e login para provedores.
+
+```bash
+orchium auth [command]
+```
+
+---
+
+#### login
+
+O orchium é alimentado pela lista de provedores em [Models.dev](https://models.dev), então você pode usar `orchium auth login` para configurar chaves de API para qualquer provedor que você gostaria de usar. Isso é armazenado em `~/.local/share/orchium/auth.json`.
+
+```bash
+orchium auth login
+```
+
+Quando o orchium é iniciado, ele carrega os provedores do arquivo de credenciais. E se houver chaves definidas em seus ambientes ou em um arquivo `.env` em seu projeto.
+
+---
+
+#### list
+
+Lista todos os provedores autenticados conforme armazenado no arquivo de credenciais.
+
+```bash
+orchium auth list
+```
+
+Ou a versão curta.
+
+```bash
+orchium auth ls
+```
+
+---
+
+#### logout
+
+Desconecta você de um provedor limpando-o do arquivo de credenciais.
+
+```bash
+orchium auth logout
+```
+
+---
+
+### github
+
+Gerencie o agente do GitHub para automação de repositórios.
+
+```bash
+orchium github [command]
+```
+
+---
+
+#### install
+
+Instale o agente do GitHub em seu repositório.
+
+```bash
+orchium github install
+```
+
+Isso configura o fluxo de trabalho necessário do GitHub Actions e o guia pelo processo de configuração. [Saiba mais](/docs/github).
+
+---
+
+#### run
+
+Execute o agente do GitHub. Isso é tipicamente usado em GitHub Actions.
+
+```bash
+orchium github run
+```
+
+##### Opções
+
+| Flag                                  | Descrição                                        |
+| ------------------------------------- | ------------------------------------------------ |
+| <nobr><code>{"--event"}</code></nobr> | Evento simulado do GitHub para executar o agente |
+| <nobr><code>{"--token"}</code></nobr> | Token de acesso pessoal do GitHub                |
+
+---
+
+### mcp
+
+Gerencie servidores do Model Context Protocol.
+
+```bash
+orchium mcp [command]
+```
+
+---
+
+#### add
+
+Adicione um servidor MCP à sua configuração.
+
+```bash
+orchium mcp add
+```
+
+Este comando irá guiá-lo na adição de um servidor MCP local ou remoto.
+
+---
+
+#### list
+
+Liste todos os servidores MCP configurados e seu status de conexão.
+
+```bash
+orchium mcp list
+```
+
+Ou use a versão curta.
+
+```bash
+orchium mcp ls
+```
+
+---
+
+#### auth
+
+Autentique-se com um servidor MCP habilitado para OAuth.
+
+```bash
+orchium mcp auth [name]
+```
+
+Se você não fornecer um nome de servidor, será solicitado que você selecione entre os servidores disponíveis habilitados para OAuth.
+
+Você também pode listar servidores habilitados para OAuth e seu status de autenticação.
+
+```bash
+orchium mcp auth list
+```
+
+Ou use a versão curta.
+
+```bash
+orchium mcp auth ls
+```
+
+---
+
+#### logout
+
+Remova credenciais OAuth para um servidor MCP.
+
+```bash
+orchium mcp logout [name]
+```
+
+---
+
+#### debug
+
+Depure problemas de conexão OAuth para um servidor MCP.
+
+```bash
+orchium mcp debug <name>
+```
+
+---
+
+### models
+
+Liste todos os modelos disponíveis dos provedores configurados.
+
+```bash
+orchium models [provider]
+```
+
+Este comando exibe todos os modelos disponíveis entre seus provedores configurados no formato `provider/model`.
+
+Isso é útil para descobrir o nome exato do modelo a ser usado em [sua configuração](/docs/config/).
+
+Você pode opcionalmente passar um ID de provedor para filtrar modelos por esse provedor.
+
+```bash
+orchium models anthropic
+```
+
+#### Opções
+
+| Flag                                    | Descrição                                                             |
+| --------------------------------------- | --------------------------------------------------------------------- |
+| <nobr><code>{"--refresh"}</code></nobr> | Atualiza o cache de modelos a partir do models.dev                    |
+| <nobr><code>{"--verbose"}</code></nobr> | Use uma saída de modelo mais detalhada (inclui metadados como custos) |
+
+Use a flag `--refresh` para atualizar a lista de modelos em cache. Isso é útil quando novos modelos foram adicionados a um provedor e você deseja vê-los no orchium.
+
+```bash
+orchium models --refresh
+```
+
+---
+
+### run
+
+Execute o orchium em modo não interativo passando um prompt diretamente.
+
+```bash
+orchium run [message..]
+```
+
+Isso é útil para scripts, automação ou quando você deseja uma resposta rápida sem iniciar o TUI completo. Por exemplo.
+
+```bash "orchium run"
+orchium run Explique o uso de context em Go
+```
+
+Você também pode se anexar a uma instância em execução do `orchium serve` para evitar tempos de inicialização a frio do servidor MCP em cada execução:
+
+```bash
+# Inicie um servidor sem cabeça em um terminal
+orchium serve
+
+# Em outro terminal, execute comandos que se anexam a ele
+orchium run --attach http://localhost:4096 "Explique async/await em JavaScript"
+```
+
+#### Opções
+
+| Flag                                     | Curto | Descrição                                                                         |
+| ---------------------------------------- | ----- | --------------------------------------------------------------------------------- |
+| <nobr><code>{"--command"}</code></nobr>  |       | O comando a ser executado, use mensagem para argumentos                           |
+| <nobr><code>{"--continue"}</code></nobr> | `-c`  | Continue a última sessão                                                          |
+| <nobr><code>{"--session"}</code></nobr>  | `-s`  | ID da sessão para continuar                                                       |
+| <nobr><code>{"--fork"}</code></nobr>     |       | Criar um fork da sessão ao continuar (use com `--continue` ou `--session`)        |
+| <nobr><code>{"--share"}</code></nobr>    |       | Compartilhe a sessão                                                              |
+| <nobr><code>{"--model"}</code></nobr>    | `-m`  | Modelo a ser usado na forma de provider/model                                     |
+| <nobr><code>{"--agent"}</code></nobr>    |       | Agente a ser usado                                                                |
+| <nobr><code>{"--file"}</code></nobr>     | `-f`  | Arquivo(s) a serem anexados à mensagem                                            |
+| <nobr><code>{"--format"}</code></nobr>   |       | Formato: padrão (formatado) ou json (eventos JSON brutos)                         |
+| <nobr><code>{"--title"}</code></nobr>    |       | Título para a sessão (usa o prompt truncado se nenhum valor for fornecido)        |
+| <nobr><code>{"--attach"}</code></nobr>   |       | Anexe a um servidor orchium em execução (por exemplo, http://localhost:4096)     |
+| <nobr><code>{"--password"}</code></nobr> | `-p`  | Senha de autenticação básica (padrão: `ORCHIUM_SERVER_PASSWORD`)                 |
+| <nobr><code>{"--username"}</code></nobr> | `-u`  | Usuário de autenticação básica (padrão: `ORCHIUM_SERVER_USERNAME` ou `orchium`) |
+| <nobr><code>{"--dir"}</code></nobr>      |       | Diretório de execução, ou caminho no servidor remoto ao anexar                    |
+| <nobr><code>{"--variant"}</code></nobr>  |       | Variante do modelo (nível de raciocínio específico do provedor)                   |
+| <nobr><code>{"--thinking"}</code></nobr> |       | Mostrar blocos de pensamento                                                      |
+| <nobr><code>{"--port"}</code></nobr>     |       | Porta para o servidor local (padrão para porta aleatória)                         |
+
+---
+
+### serve
+
+Inicie um servidor orchium sem cabeça para acesso à API. Confira a [documentação do servidor](/docs/server) para a interface HTTP completa.
+
+```bash
+orchium serve
+```
+
+Isso inicia um servidor HTTP que fornece acesso à funcionalidade do orchium sem a interface TUI. Defina `ORCHIUM_SERVER_PASSWORD` para habilitar a autenticação básica HTTP (o nome de usuário padrão é `orchium`).
+
+#### Opções
+
+| Flag                                     | Descrição                                             |
+| ---------------------------------------- | ----------------------------------------------------- |
+| <nobr><code>{"--port"}</code></nobr>     | Porta para escutar                                    |
+| <nobr><code>{"--hostname"}</code></nobr> | Nome do host para escutar                             |
+| <nobr><code>{"--mdns"}</code></nobr>     | Habilitar descoberta mDNS                             |
+| <nobr><code>{"--cors"}</code></nobr>     | Origem(ns) de navegador adicionais para permitir CORS |
+
+---
+
+### session
+
+Gerencie sessões do orchium.
+
+```bash
+orchium session [command]
+```
+
+---
+
+#### list
+
+Liste todas as sessões do orchium.
+
+```bash
+orchium session list
+```
+
+##### Opções
+
+| Flag                                      | Curto | Descrição                                 |
+| ----------------------------------------- | ----- | ----------------------------------------- |
+| <nobr><code>{"--max-count"}</code></nobr> | `-n`  | Limitar às N sessões mais recentes        |
+| <nobr><code>{"--format"}</code></nobr>    |       | Formato de saída: tabela ou json (tabela) |
+
+---
+
+### stats
+
+Mostre o uso de tokens e estatísticas de custo para suas sessões do orchium.
+
+```bash
+orchium stats
+```
+
+#### Opções
+
+| Flag                                    | Descrição                                                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| <nobr><code>{"--days"}</code></nobr>    | Mostre estatísticas dos últimos N dias (todo o tempo)                                                |
+| <nobr><code>{"--tools"}</code></nobr>   | Número de ferramentas a serem mostradas (todas)                                                      |
+| <nobr><code>{"--models"}</code></nobr>  | Mostre a divisão do uso de modelos (oculto por padrão). Passe um número para mostrar os N principais |
+| <nobr><code>{"--project"}</code></nobr> | Filtrar por projeto (todos os projetos, string vazia: projeto atual)                                 |
+
+---
+
+### export
+
+Exporte dados da sessão como JSON.
+
+```bash
+orchium export [sessionID]
+```
+
+Se você não fornecer um ID de sessão, será solicitado que você selecione entre as sessões disponíveis.
+
+---
+
+### import
+
+Importe dados da sessão de um arquivo JSON ou URL de compartilhamento do orchium.
+
+```bash
+orchium import <file>
+```
+
+Você pode importar de um arquivo local ou de uma URL de compartilhamento do orchium.
+
+```bash
+orchium import session.json
+orchium import https://opncd.ai/s/abc123
+```
+
+---
+
+### web
+
+Inicie um servidor orchium sem cabeça com uma interface web.
+
+```bash
+orchium web
+```
+
+Isso inicia um servidor HTTP e abre um navegador para acessar o orchium através de uma interface web. Defina `ORCHIUM_SERVER_PASSWORD` para habilitar a autenticação básica HTTP (o nome de usuário padrão é `orchium`).
+
+#### Opções
+
+| Flag                                     | Descrição                                             |
+| ---------------------------------------- | ----------------------------------------------------- |
+| <nobr><code>{"--port"}</code></nobr>     | Porta para escutar                                    |
+| <nobr><code>{"--hostname"}</code></nobr> | Nome do host para escutar                             |
+| <nobr><code>{"--mdns"}</code></nobr>     | Habilitar descoberta mDNS                             |
+| <nobr><code>{"--cors"}</code></nobr>     | Origem(ns) de navegador adicionais para permitir CORS |
+
+---
+
+### acp
+
+Inicie um servidor ACP (Agent Client Protocol).
+
+```bash
+orchium acp
+```
+
+Este comando inicia um servidor ACP que se comunica via stdin/stdout usando nd-JSON.
+
+#### Opções
+
+| Flag                                     | Descrição                 |
+| ---------------------------------------- | ------------------------- |
+| <nobr><code>{"--cwd"}</code></nobr>      | Diretório de trabalho     |
+| <nobr><code>{"--port"}</code></nobr>     | Porta para escutar        |
+| <nobr><code>{"--hostname"}</code></nobr> | Nome do host para escutar |
+
+---
+
+### uninstall
+
+Desinstale o orchium e remova todos os arquivos relacionados.
+
+```bash
+orchium uninstall
+```
+
+#### Opções
+
+| Flag                                        | Curto | Descrição                                |
+| ------------------------------------------- | ----- | ---------------------------------------- |
+| <nobr><code>{"--keep-config"}</code></nobr> | `-c`  | Manter arquivos de configuração          |
+| <nobr><code>{"--keep-data"}</code></nobr>   | `-d`  | Manter dados de sessão e snapshots       |
+| <nobr><code>{"--dry-run"}</code></nobr>     |       | Mostrar o que seria removido sem remover |
+| <nobr><code>{"--force"}</code></nobr>       | `-f`  | Pular prompts de confirmação             |
+
+---
+
+### upgrade
+
+Atualiza o orchium para a versão mais recente ou uma versão específica.
+
+```bash
+orchium upgrade [target]
+```
+
+Para atualizar para a versão mais recente.
+
+```bash
+orchium upgrade
+```
+
+Para atualizar para uma versão específica.
+
+```bash
+orchium upgrade v0.1.48
+```
+
+#### Opções
+
+| Flag                                   | Curto | Descrição                                                        |
+| -------------------------------------- | ----- | ---------------------------------------------------------------- |
+| <nobr><code>{"--method"}</code></nobr> | `-m`  | O método de instalação que foi usado; curl, npm, pnpm, bun, brew |
+
+---
+
+## Opções Globais
+
+A CLI do orchium aceita as seguintes flags globais.
+
+| Flag                                       | Curto | Descrição                               |
+| ------------------------------------------ | ----- | --------------------------------------- |
+| <nobr><code>{"--help"}</code></nobr>       | `-h`  | Exibir ajuda                            |
+| <nobr><code>{"--version"}</code></nobr>    | `-v`  | Imprimir número da versão               |
+| <nobr><code>{"--print-logs"}</code></nobr> |       | Imprimir logs no stderr                 |
+| <nobr><code>{"--log-level"}</code></nobr>  |       | Nível de log (DEBUG, INFO, WARN, ERROR) |
+
+---
+
+## Variáveis de ambiente
+
+O orchium pode ser configurado usando variáveis de ambiente.
+
+| Variável                              | Tipo    | Descrição                                                             |
+| ------------------------------------- | ------- | --------------------------------------------------------------------- |
+| `ORCHIUM_AUTO_SHARE`                 | boolean | Compartilhar sessões automaticamente                                  |
+| `ORCHIUM_GIT_BASH_PATH`              | string  | Caminho para o executável do Git Bash no Windows                      |
+| `ORCHIUM_CONFIG`                     | string  | Caminho para o arquivo de configuração                                |
+| `ORCHIUM_CONFIG_DIR`                 | string  | Caminho para o diretório de configuração                              |
+| `ORCHIUM_CONFIG_CONTENT`             | string  | Conteúdo de configuração json inline                                  |
+| `ORCHIUM_DISABLE_AUTOUPDATE`         | boolean | Desabilitar verificações de atualização automática                    |
+| `ORCHIUM_DISABLE_PRUNE`              | boolean | Desabilitar a poda de dados antigos                                   |
+| `ORCHIUM_DISABLE_TERMINAL_TITLE`     | boolean | Desabilitar atualizações automáticas do título do terminal            |
+| `ORCHIUM_PERMISSION`                 | string  | Configuração de permissões json inline                                |
+| `ORCHIUM_DISABLE_DEFAULT_PLUGINS`    | boolean | Desabilitar plugins padrão                                            |
+| `ORCHIUM_DISABLE_LSP_DOWNLOAD`       | boolean | Desabilitar downloads automáticos do servidor LSP                     |
+| `ORCHIUM_ENABLE_EXPERIMENTAL_MODELS` | boolean | Habilitar modelos experimentais                                       |
+| `ORCHIUM_DISABLE_AUTOCOMPACT`        | boolean | Desabilitar compactação automática de contexto                        |
+| `ORCHIUM_DISABLE_CLAUDE_CODE`        | boolean | Desabilitar leitura de `.claude` (prompt + habilidades)               |
+| `ORCHIUM_DISABLE_CLAUDE_CODE_PROMPT` | boolean | Desabilitar leitura de `~/.claude/CLAUDE.md`                          |
+| `ORCHIUM_DISABLE_CLAUDE_CODE_SKILLS` | boolean | Desabilitar carregamento de `.claude/skills`                          |
+| `ORCHIUM_DISABLE_MODELS_FETCH`       | boolean | Desabilitar busca de modelos de fontes remotas                        |
+| `ORCHIUM_FAKE_VCS`                   | string  | Provedor VCS falso para fins de teste                                 |
+| `ORCHIUM_CLIENT`                     | string  | Identificador do cliente (padrão é `cli`)                             |
+| `ORCHIUM_ENABLE_EXA`                 | boolean | Habilitar ferramentas de busca web Exa                                |
+| `ORCHIUM_SERVER_PASSWORD`            | string  | Habilitar autenticação básica para `serve`/`web`                      |
+| `ORCHIUM_SERVER_USERNAME`            | string  | Substituir nome de usuário de autenticação básica (padrão `orchium`) |
+| `ORCHIUM_MODELS_URL`                 | string  | URL personalizada para buscar configuração de modelos                 |
+
+---
+
+### Experimental
+
+Essas variáveis de ambiente habilitam recursos experimentais que podem mudar ou ser removidos.
+
+| Variável                                        | Tipo    | Descrição                                                 |
+| ----------------------------------------------- | ------- | --------------------------------------------------------- |
+| `ORCHIUM_EXPERIMENTAL`                         | boolean | Habilitar recursos experimentais sob o sinalizador global |
+| `ORCHIUM_EXPERIMENTAL_ICON_DISCOVERY`          | boolean | Habilitar descoberta de ícones                            |
+| `ORCHIUM_EXPERIMENTAL_DISABLE_COPY_ON_SELECT`  | boolean | Desabilitar cópia ao selecionar no TUI                    |
+| `ORCHIUM_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS` | number  | Tempo limite padrão para comandos bash em ms              |
+| `ORCHIUM_EXPERIMENTAL_OUTPUT_TOKEN_MAX`        | number  | Máximo de tokens de saída para respostas LLM              |
+| `ORCHIUM_EXPERIMENTAL_FILEWATCHER`             | boolean | Habilitar monitoramento de arquivos para todo o diretório |
+| `ORCHIUM_EXPERIMENTAL_OXFMT`                   | boolean | Habilitar formatador oxfmt                                |
+| `ORCHIUM_EXPERIMENTAL_LSP_TOOL`                | boolean | Habilitar ferramenta LSP experimental                     |
+| `ORCHIUM_EXPERIMENTAL_DISABLE_FILEWATCHER`     | boolean | Desabilitar monitoramento de arquivos                     |
+| `ORCHIUM_EXPERIMENTAL_EXA`                     | boolean | Habilitar recursos experimentais do Exa                   |
+| `ORCHIUM_EXPERIMENTAL_LSP_TY`                  | boolean | Habilitar TY LSP para arquivos python                     |
+| `ORCHIUM_EXPERIMENTAL_PLAN_MODE`               | boolean | Habilitar modo de plano                                   |
+| `ORCHIUM_EXPERIMENTAL_BACKGROUND_SUBAGENTS`    | boolean | Habilitar tarefas de subagentes em segundo plano          |
+| `ORCHIUM_EXPERIMENTAL_EVENT_SYSTEM`            | boolean | Habilitar sistema de eventos experimental                 |
+| `ORCHIUM_EXPERIMENTAL_NATIVE_LLM`              | boolean | Habilitar caminho nativo de requisição LLM                |
+| `ORCHIUM_EXPERIMENTAL_PARALLEL`                | boolean | Habilitar execução paralela de busca web                  |
+| `ORCHIUM_EXPERIMENTAL_SCOUT`                   | boolean | Habilitar subagente Scout                                 |
+| `ORCHIUM_EXPERIMENTAL_WORKSPACES`              | boolean | Habilitar suporte a espaços de trabalho                   |
