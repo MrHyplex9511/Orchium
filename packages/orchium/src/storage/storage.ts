@@ -4,6 +4,7 @@ import { Global } from "@orchium/core/global"
 import { FSUtil } from "@orchium/core/fs-util"
 import { Effect, Exit, Layer, Option, RcMap, Schema, Context, TxReentrantLock } from "effect"
 import { NonNegativeInt } from "@orchium/core/schema"
+import { EffectFlock } from "@orchium/core/util/effect-flock"
 import { Git } from "@/git"
 
 type Migration = (dir: string, fs: FSUtil.Interface, git: Git.Interface) => Effect.Effect<void, FSUtil.Error>
@@ -215,6 +216,7 @@ const layer = Layer.effect(
   Effect.gen(function* () {
     const fs = yield* FSUtil.Service
     const git = yield* Git.Service
+    const flock = yield* EffectFlock.Service
     const locks = yield* RcMap.make({
       lookup: () => TxReentrantLock.make(),
       idleTimeToLive: 0,
@@ -248,8 +250,19 @@ const layer = Layer.effect(
     const wrap = <A>(target: string, body: Effect.Effect<A, FSUtil.Error>) =>
       body.pipe(Effect.catchIf(missing, () => fail(target)))
 
+    // The JSON store lives in the global data dir shared by every running
+    // instance. The in-process TxReentrantLock above only serializes threads
+    // within one process; the cross-process flock closes the window where two
+    // instances (TUI + server, two TUIs) write the same file concurrently.
+    const crossProcess = <A, E>(target: string, body: Effect.Effect<A, E>) =>
+      body.pipe(
+        flock.withLock(`storage:${target}`),
+        Effect.catchTag("LockTimeoutError", Effect.die),
+        Effect.catchTag("LockCompromisedError", Effect.die),
+      )
+
     const writeJson = Effect.fnUntraced(function* (target: string, content: unknown) {
-      yield* fs.writeWithDirs(target, JSON.stringify(content, null, 2))
+      yield* crossProcess(target, fs.writeWithDirs(target, JSON.stringify(content, null, 2)))
     })
 
     const withResolved = <A, E>(
@@ -265,7 +278,10 @@ const layer = Layer.effect(
 
     const remove: Interface["remove"] = Effect.fn("Storage.remove")(function* (key: string[]) {
       yield* withResolved(key, (target, rw) =>
-        TxReentrantLock.withWriteLock(rw, fs.remove(target).pipe(Effect.catchIf(missing, () => Effect.void))),
+        TxReentrantLock.withWriteLock(
+          rw,
+          crossProcess(target, fs.remove(target).pipe(Effect.catchIf(missing, () => Effect.void))),
+        ),
       )
     })
 
@@ -322,6 +338,6 @@ const layer = Layer.effect(
   }),
 )
 
-export const node = LayerNode.make({ service: Service, layer: layer, deps: [FSUtil.node, Git.node] })
+export const node = LayerNode.make({ service: Service, layer: layer, deps: [FSUtil.node, Git.node, EffectFlock.node] })
 
 export * as Storage from "./storage"

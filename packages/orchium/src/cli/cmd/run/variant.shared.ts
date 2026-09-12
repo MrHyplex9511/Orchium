@@ -12,11 +12,17 @@ import { AppNodeBuilder } from "@orchium/core/effect/app-node-builder"
 import { Context, Effect, Layer } from "effect"
 import { makeRuntime } from "@/effect/run-service"
 import { Global } from "@orchium/core/global"
+import { Flock } from "@orchium/core/util/flock"
 import { isRecord } from "@/util/record"
 import { createSession, sessionVariant, type RunSession, type SessionMessages } from "./session.shared"
 import type { RunInput, RunProvider } from "./types"
 
 const MODEL_FILE = path.join(Global.Path.state, "model.json")
+
+// Shared across every running instance on the machine: saveVariant is a
+// read-modify-write, so it must be serialized across processes or two instances
+// cycling variants can clobber each other's saved entry.
+const MODEL_LOCK_KEY = `model-variant:${MODEL_FILE}`
 
 type ModelState = Record<string, unknown> & {
   variant?: Record<string, string | undefined>
@@ -166,25 +172,32 @@ function createLayer(fs = AppNodeBuilder.build(FSUtil.node)) {
             return
           }
 
-          const current = yield* read()
-          const next = {
-            ...current.variant,
-          }
-          const key = variantKey(model)
-          if (variant) {
-            next[key] = variant
-          }
+          yield* Effect.scoped(
+            Effect.gen(function* () {
+              yield* Flock.effect(MODEL_LOCK_KEY)
+              // Re-read under the lock so a concurrent instance's save is not
+              // clobbered by a stale read-modify-write.
+              const current = yield* read()
+              const next = {
+                ...current.variant,
+              }
+              const key = variantKey(model)
+              if (variant) {
+                next[key] = variant
+              }
 
-          if (!variant) {
-            delete next[key]
-          }
+              if (!variant) {
+                delete next[key]
+              }
 
-          yield* file
-            .writeJson(MODEL_FILE, {
-              ...current,
-              variant: next,
-            })
-            .pipe(Effect.orElseSucceed(() => undefined))
+              yield* file
+                .writeJson(MODEL_FILE, {
+                  ...current,
+                  variant: next,
+                })
+                .pipe(Effect.orElseSucceed(() => undefined))
+            }),
+          )
         })
 
         return Service.of({

@@ -4,10 +4,16 @@ import { Effect, Layer, Record, Result, Schema, Context } from "effect"
 import { NonNegativeInt } from "@orchium/core/schema"
 import { Global } from "@orchium/core/global"
 import { FSUtil } from "@orchium/core/fs-util"
+import { EffectFlock } from "@orchium/core/util/effect-flock"
 
 export const OAUTH_DUMMY_KEY = "orchium-oauth-dummy-key"
 
 const file = path.join(Global.Path.data, "auth.json")
+
+// Shared across every running instance on the machine (TUI, server, CLIs). The
+// read-modify-write in set/remove must be serialized across processes or a
+// concurrent login can clobber another instance's credential entry.
+const lockKey = `auth:${file}`
 
 const fail = (message: string) => (cause: unknown) => new AuthError({ message, cause })
 
@@ -53,6 +59,7 @@ const layer = Layer.effect(
   Service,
   Effect.gen(function* () {
     const fsys = yield* FSUtil.Service
+    const flock = yield* EffectFlock.Service
     const decode = Schema.decodeUnknownOption(Info)
 
     const all = Effect.fn("Auth.all")(function* () {
@@ -70,28 +77,47 @@ const layer = Layer.effect(
       return (yield* all())[providerID]
     })
 
+    const mutate = Effect.fn("Auth.mutate")(function* (
+      update: (data: Record<string, unknown>) => Record<string, unknown> | undefined,
+    ) {
+      yield* Effect.gen(function* () {
+        const next = update(yield* all())
+        if (!next) return
+        yield* fsys.writeJson(file, next, 0o600).pipe(Effect.mapError(fail("Failed to write auth data")))
+      }).pipe(
+        flock.withLock(lockKey),
+        // Lock failures are defects: retrying the login is the caller's concern,
+        // and callers already orDie these flows.
+        Effect.catchTag("LockTimeoutError", (e) => Effect.die(e)),
+        Effect.catchTag("LockCompromisedError", (e) => Effect.die(e)),
+      )
+    })
+
     const set = Effect.fn("Auth.set")(function* (key: string, info: Info) {
-      const norm = key.replace(/\/+$/, "")
-      const data = yield* all()
-      if (norm !== key) delete data[key]
-      delete data[norm + "/"]
-      yield* fsys
-        .writeJson(file, { ...data, [norm]: info }, 0o600)
-        .pipe(Effect.mapError(fail("Failed to write auth data")))
+      yield* mutate((data) => {
+        const norm = key.replace(/\/+$/, "")
+        const next = { ...data }
+        if (norm !== key) delete next[key]
+        delete next[norm + "/"]
+        next[norm] = info
+        return next
+      })
     })
 
     const remove = Effect.fn("Auth.remove")(function* (key: string) {
-      const norm = key.replace(/\/+$/, "")
-      const data = yield* all()
-      delete data[key]
-      delete data[norm]
-      yield* fsys.writeJson(file, data, 0o600).pipe(Effect.mapError(fail("Failed to write auth data")))
+      yield* mutate((data) => {
+        const norm = key.replace(/\/+$/, "")
+        const next = { ...data }
+        delete next[key]
+        delete next[norm]
+        return next
+      })
     })
 
     return Service.of({ get, all, set, remove })
   }),
 )
 
-export const node = LayerNode.make({ service: Service, layer: layer, deps: [FSUtil.node] })
+export const node = LayerNode.make({ service: Service, layer: layer, deps: [FSUtil.node, EffectFlock.node] })
 
 export * as Auth from "."
