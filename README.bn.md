@@ -50,16 +50,11 @@
 ### ইনস্টলেশন (Installation)
 
 ```bash
-# Package managers
-npm i -g orchium@latest        # or bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS and Linux (recommended, always up to date)
-brew install orchium              # macOS and Linux (official brew formula, updated less)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # Any OS
-nix run nixpkgs#orchium           # or github:MrHyplex9511/Orchium for latest dev branch
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -78,9 +73,7 @@ Orchium ডেস্কটপ অ্যাপ্লিকেশন হিসে�
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### ইনস্টলেশন ডিরেক্টরি (Installation Directory)

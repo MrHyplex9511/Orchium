@@ -50,16 +50,11 @@
 ### Instalacija
 
 ```bash
-# Package manageri
-npm i -g orchium@latest        # ili bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS i Linux (preporučeno, uvijek ažurno)
-brew install orchium              # macOS i Linux (zvanična brew formula, rjeđe se ažurira)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # Bilo koji OS
-nix run nixpkgs#orchium           # ili github:MrHyplex9511/Orchium za najnoviji dev branch
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -78,9 +73,7 @@ Orchium je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice i
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### Instalacijski direktorij

@@ -50,16 +50,11 @@
 ### Instalación
 
 ```bash
-# Gestores de paquetes
-npm i -g orchium@latest        # o bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS y Linux (recomendado, siempre al día)
-brew install orchium              # macOS y Linux (fórmula oficial de brew, se actualiza menos)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # cualquier sistema
-nix run nixpkgs#orchium           # o github:MrHyplex9511/Orchium para la rama dev más reciente
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -78,9 +73,7 @@ Orchium también está disponible como aplicación de escritorio. Descárgala di
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### Directorio de instalación

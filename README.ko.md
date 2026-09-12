@@ -49,16 +49,11 @@
 ### 설치
 
 ```bash
-# 패키지 매니저
-npm i -g orchium@latest        # bun/pnpm/yarn 도 가능
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS 및 Linux (권장, 항상 최신)
-brew install orchium              # macOS 및 Linux (공식 brew formula, 업데이트 빈도 낮음)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # 어떤 OS든
-nix run nixpkgs#orchium           # 또는 github:MrHyplex9511/Orchium 로 최신 dev 브랜치
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -77,9 +72,7 @@ Orchium 은 데스크톱 앱으로도 제공됩니다. [releases page](https://g
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### 설치 디렉터리

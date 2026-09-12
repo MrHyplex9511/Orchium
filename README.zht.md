@@ -49,16 +49,11 @@
 ### 安裝
 
 ```bash
-# 套件管理員
-npm i -g orchium@latest        # 也可使用 bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS 與 Linux（推薦，始終保持最新）
-brew install orchium              # macOS 與 Linux（官方 brew formula，更新頻率較低）
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # 任何作業系統
-nix run nixpkgs#orchium           # 或使用 github:MrHyplex9511/Orchium 以取得最新開發分支
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -77,9 +72,7 @@ Orchium 也提供桌面版應用程式。您可以直接從 [發佈頁面 (relea
 
 ```bash
 # macOS (Homebrew Cask)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### 安裝目錄

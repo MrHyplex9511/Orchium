@@ -50,16 +50,11 @@
 ### Cài đặt
 
 ```bash
-# Các trình quản lý gói (Package managers)
-npm i -g orchium@latest        # hoặc bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS và Linux (khuyên dùng, luôn cập nhật)
-brew install orchium              # macOS và Linux (công thức brew chính thức, ít cập nhật hơn)
-sudo pacman -S orchium            # Arch Linux (Bản ổn định)
-paru -S orchium-bin               # Arch Linux (Bản mới nhất từ AUR)
-mise use -g orchium               # Mọi hệ điều hành
-nix run nixpkgs#orchium           # hoặc github:MrHyplex9511/Orchium cho nhánh dev mới nhất
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -78,9 +73,7 @@ Orchium cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiếp
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### Thư mục cài đặt

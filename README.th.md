@@ -49,16 +49,11 @@
 ### การติดตั้ง
 
 ```bash
-# ตัวจัดการแพ็กเกจ
-npm i -g orchium@latest        # หรือ bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS และ Linux (แนะนำ อัปเดตเสมอ)
-brew install orchium              # macOS และ Linux (brew formula อย่างเป็นทางการ อัปเดตน้อยกว่า)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # ระบบปฏิบัติการใดก็ได้
-nix run nixpkgs#orchium           # หรือ github:MrHyplex9511/Orchium สำหรับสาขาพัฒนาล่าสุด
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -77,9 +72,7 @@ Orchium มีให้ใช้งานเป็นแอปพลิเคช
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### ไดเรกทอรีการติดตั้ง

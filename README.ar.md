@@ -50,16 +50,11 @@
 ### التثبيت
 
 ```bash
-# مديري الحزم
-npm i -g orchium@latest        # او bun/pnpm/yarn
-scoop install orchium             # Windows
-choco install orchium             # Windows
-brew install anomalyco/tap/orchium # macOS و Linux (موصى به، دائما محدث)
-brew install orchium              # macOS و Linux (صيغة brew الرسمية، تحديث اقل)
-sudo pacman -S orchium            # Arch Linux (Stable)
-paru -S orchium-bin               # Arch Linux (Latest from AUR)
-mise use -g orchium               # اي نظام
-nix run nixpkgs#orchium           # او github:MrHyplex9511/Orchium لاحدث فرع dev
+# Quick install (macOS, Linux, Windows)
+curl -fsSL https://raw.githubusercontent.com/MrHyplex9511/Orchium/dev/install | bash
+
+# or use Nix (latest dev branch)
+nix run github:MrHyplex9511/Orchium
 ```
 
 > [!TIP]
@@ -78,9 +73,7 @@ nix run nixpkgs#orchium           # او github:MrHyplex9511/Orchium لاحدث 
 
 ```bash
 # macOS (Homebrew)
-brew install --cask orchium-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/orchium-desktop
+# macOS and Windows: download from the releases page (see the table above)
 ```
 
 #### مجلد التثبيت

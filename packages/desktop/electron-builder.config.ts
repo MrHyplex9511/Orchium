@@ -138,7 +138,7 @@ function getConfig() {
         appId,
         productName: "Orchium Beta",
         protocols: { name: "Orchium Beta", schemes: ["orchium"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "orchium-beta", channel: "latest" },
+        publish: { provider: "github", owner: "MrHyplex9511", repo: "Orchium-beta", channel: "latest" },
         deb: { fpm: [metainfoFpm(appId)] },
         rpm: { packageName: "orchium-beta", fpm: [metainfoFpm(appId)] },
       }
@@ -149,7 +149,7 @@ function getConfig() {
         appId,
         productName: "Orchium",
         protocols: { name: "Orchium", schemes: ["orchium"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "orchium", channel: "latest" },
+        publish: { provider: "github", owner: "MrHyplex9511", repo: "Orchium", channel: "latest" },
         deb: { fpm: [metainfoFpm(appId), legacyDesktopEntryFpm] },
         rpm: { packageName: "orchium", fpm: [metainfoFpm(appId), legacyDesktopEntryFpm] },
       }
