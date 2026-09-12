@@ -24,13 +24,7 @@ type Diff = {
 
 const repo = process.env.GH_REPO ?? "anomalyco/opencode"
 const bot = ["actions-user", "github-actions[bot]", "orchium", "orchium-agent[bot]"]
-const team = [
-  ...(await Bun.file(new URL("../.github/TEAM_MEMBERS", import.meta.url))
-    .text()
-    .then((x) => x.split(/\r?\n/).map((x) => x.trim()))
-    .then((x) => x.filter((x) => x && !x.startsWith("#")))),
-  ...bot,
-]
+const team = [...bot]
 const order = ["Core", "TUI", "Desktop", "SDK", "Extensions"] as const
 const sections = {
   core: "Core",
