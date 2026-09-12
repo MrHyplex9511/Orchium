@@ -736,6 +736,149 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         },
       }
     }),
+    ollama: Effect.fnUntraced(function* (input: Info) {
+      const env = yield* dep.env()
+      // OLLAMA_HOST overrides the default local endpoint; a configured baseURL wins over env.
+      const configured = typeof input.options?.baseURL === "string" ? input.options.baseURL : undefined
+      const host = iife(() => {
+        const raw = configured ?? env["OLLAMA_HOST"] ?? "http://localhost:11434"
+        const trimmed = raw.trim().replace(/\/+$/, "")
+        return /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`
+      })
+      const baseURL = `${host}/v1`
+      return {
+        autoload: true,
+        options: { baseURL },
+        async discoverModels(): Promise<Record<string, Model>> {
+          try {
+            const tags = await fetch(`${host}/api/tags`, {
+              signal: AbortSignal.timeout(5_000),
+            })
+            if (!tags.ok) return {}
+            const data = (await tags.json()) as { models?: { name?: string; model?: string }[] }
+            const models: Record<string, Model> = {}
+            for (const tag of data.models ?? []) {
+              const id = tag.name ?? tag.model
+              if (!id || input.models[id]) continue
+              models[id] = {
+                id: ModelV2.ID.make(id),
+                providerID: ProviderV2.ID.make("ollama"),
+                name: id,
+                family: "",
+                api: {
+                  id,
+                  url: baseURL,
+                  npm: "@ai-sdk/openai-compatible",
+                },
+                status: "active",
+                headers: {},
+                options: {},
+                cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+                // Ollama's /api/tags does not report context/output limits; 0 = unknown
+                // (overflow/usage checks treat 0 as "skip").
+                limit: { context: 0, output: 0 },
+                capabilities: {
+                  temperature: true,
+                  reasoning: false,
+                  attachment: false,
+                  toolcall: true,
+                  input: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  output: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  interleaved: false,
+                },
+                release_date: "",
+                variants: {},
+              }
+            }
+            return models
+          } catch (e) {
+            return {}
+          }
+        },
+      }
+    }),
+    lmstudio: Effect.fnUntraced(function* (input: Info) {
+      const configured = typeof input.options?.baseURL === "string" ? input.options.baseURL : undefined
+      const host = iife(() => {
+        const raw = configured ?? "http://127.0.0.1:1234"
+        const trimmed = raw.trim().replace(/\/+$/, "")
+        return /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`
+      })
+      const baseURL = `${host}/v1`
+      return {
+        autoload: true,
+        options: { baseURL },
+        async discoverModels(): Promise<Record<string, Model>> {
+          try {
+            // LM Studio exposes an OpenAI-compatible /v1/models endpoint.
+            const res = await fetch(`${baseURL}/models`, {
+              signal: AbortSignal.timeout(5_000),
+            })
+            if (!res.ok) return {}
+            const data = (await res.json()) as { data?: { id?: string }[] }
+            const models: Record<string, Model> = {}
+            for (const item of data.data ?? []) {
+              const id = item.id
+              if (!id || input.models[id]) continue
+              models[id] = {
+                id: ModelV2.ID.make(id),
+                providerID: ProviderV2.ID.make("lmstudio"),
+                name: id,
+                family: "",
+                api: {
+                  id,
+                  url: baseURL,
+                  npm: "@ai-sdk/openai-compatible",
+                },
+                status: "active",
+                headers: {},
+                options: {},
+                cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+                limit: { context: 0, output: 0 },
+                capabilities: {
+                  temperature: true,
+                  reasoning: false,
+                  attachment: false,
+                  toolcall: true,
+                  input: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  output: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  interleaved: false,
+                },
+                release_date: "",
+                variants: {},
+              }
+            }
+            return models
+          } catch (e) {
+            return {}
+          }
+        },
+      }
+    }),
     "cloudflare-workers-ai": Effect.fnUntraced(function* (input: Info) {
       // When baseURL is already configured (e.g. corporate config routing through a proxy/gateway),
       // skip the account ID check because the URL is already fully specified.
@@ -1405,6 +1548,31 @@ const layer = Layer.effect(
         const catalog = mapValues(modelsDev, fromModelsDevProvider)
         const database = mapValues(catalog, toPublicInfo)
 
+        // Local OpenAI-compatible servers (Ollama, LM Studio) are not part of the
+        // models.dev catalog. Seed them so the custom loaders below can register
+        // autoload providers. `env` stays empty: the env-key loop would otherwise
+        // treat OLLAMA_HOST as an API key instead of a base URL.
+        if (!database[ProviderV2.ID.make("ollama")]) {
+          database[ProviderV2.ID.make("ollama")] = {
+            id: ProviderV2.ID.make("ollama"),
+            name: "Ollama (local)",
+            source: "custom",
+            env: [],
+            options: {},
+            models: {},
+          }
+        }
+        if (!database[ProviderV2.ID.make("lmstudio")]) {
+          database[ProviderV2.ID.make("lmstudio")] = {
+            id: ProviderV2.ID.make("lmstudio"),
+            name: "LM Studio (local)",
+            source: "custom",
+            env: [],
+            options: {},
+            models: {},
+          }
+        }
+
         const providers: Record<ProviderV2.ID, Info> = {} as Record<ProviderV2.ID, Info>
         const languages = new Map<string, LanguageModelV3>()
         const modelLoaders: {
@@ -1666,6 +1834,21 @@ const layer = Layer.effect(
               }
             } catch (e) {}
           })
+        }
+
+        for (const localID of [ProviderV2.ID.make("ollama"), ProviderV2.ID.make("lmstudio")]) {
+          if (discoveryLoaders[localID] && providers[localID] && isProviderAllowed(localID)) {
+            yield* Effect.promise(async () => {
+              try {
+                const discovered = await discoveryLoaders[localID]()
+                for (const [modelID, model] of Object.entries(discovered)) {
+                  if (!providers[localID].models[modelID]) {
+                    providers[localID].models[modelID] = model
+                  }
+                }
+              } catch (e) {}
+            })
+          }
         }
 
         for (const [id, provider] of Object.entries(providers)) {
