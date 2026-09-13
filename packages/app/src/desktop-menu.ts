@@ -279,8 +279,8 @@ export const DESKTOP_MENU: DesktopMenu[] = [
     id: "help",
     labelKey: "desktop.menu.help",
     items: [
-      { type: "item", labelKey: "desktop.menu.documentation", href: "https://opencode.ai/docs" },
-      { type: "item", labelKey: "desktop.menu.supportForum", href: "https://discord.com/invite/orchium" },
+      { type: "item", labelKey: "desktop.menu.documentation", href: "https://github.com/MrHyplex9511/Orchium" },
+      { type: "item", labelKey: "desktop.menu.supportForum", href: "https://discord.gg/SDyAKPEhN8" },
       { type: "item", labelKey: "desktop.menu.exportLogs", command: "logs.export" },
       { type: "separator" },
       {

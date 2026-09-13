@@ -1,6 +1,6 @@
 # orchium GitHub Action
 
-A GitHub Action that integrates [orchium](https://opencode.ai) directly into your GitHub workflow.
+A GitHub Action that integrates [orchium](https://github.com/MrHyplex9511/Orchium) directly into your GitHub workflow.
 
 Mention `/orchium` in your comment, and orchium will execute tasks within your GitHub Actions runner.
 

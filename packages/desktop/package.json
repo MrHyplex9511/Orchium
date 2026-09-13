@@ -4,10 +4,10 @@
   "version": "1.18.30",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://opencode.ai",
+  "homepage": "https://github.com/MrHyplex9511/Orchium",
   "author": {
     "name": "Orchium",
-    "email": "hello@opencode.ai"
+    "email": "kingbro6.sau@gmail.com"
   },
   "scripts": {
     "typecheck": "tsgo -b",
