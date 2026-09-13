@@ -364,7 +364,7 @@ jobs:
           persist-credentials: false
 
       - name: Run orchium
-        uses: anomalyco/opencode/github@latest${envStr}
+        uses: MrHyplex9511/Orchium/github@latest${envStr}
         with:
           model: ${provider}/${model}`,
         )
