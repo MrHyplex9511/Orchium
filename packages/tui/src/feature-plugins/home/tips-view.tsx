@@ -70,7 +70,7 @@ function parse(tip: string): TipPart[] {
 
 const NO_MODELS_TIP = "Run {highlight}/connect{/highlight} to add an AI provider and start coding"
 const NO_MODELS_PARTS = parse(NO_MODELS_TIP)
-const EASTER_EGG_TIP = "Also try {highlight}OpenCode{/highlight}!"
+const EASTER_EGG_TIP = "Also try {highlight}Orchium{/highlight}!"
 const EASTER_EGG_CHANCE = 0.02
 
 function shortcutText(value: string) {
