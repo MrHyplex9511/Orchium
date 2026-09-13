@@ -1081,7 +1081,6 @@
     "@opentui/core": "catalog:",
     "@opentui/keymap": "catalog:",
     "@opentui/solid": "catalog:",
-    "@orchium/plugin": "packages/plugin",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
   },

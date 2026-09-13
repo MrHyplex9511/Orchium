@@ -138,7 +138,6 @@
   ],
   "overrides": {
     "@ai-sdk/anthropic": "3.0.111",
-    "@opencode-ai/plugin": "$@orchium/plugin",
     "@opentui/core": "catalog:",
     "@opentui/keymap": "catalog:",
     "@opentui/solid": "catalog:",
