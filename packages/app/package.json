@@ -1,6 +1,6 @@
 {
   "name": "@orchium/app",
-  "version": "1.18.30",
+  "version": "1.0.0",
   "description": "",
   "type": "module",
   "exports": {

@@ -29,7 +29,7 @@
     },
     "packages/app": {
       "name": "@orchium/app",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@corvu/drawer": "catalog:",
         "@dnd-kit/abstract": "0.5.0",
@@ -96,7 +96,7 @@
     },
     "packages/cli": {
       "name": "@orchium/cli",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "bin": {
         "lildax": "./bin/lildax.cjs",
       },
@@ -144,7 +144,7 @@
     },
     "packages/codemode": {
       "name": "@orchium/codemode",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "acorn": "8.15.0",
         "effect": "catalog:",
@@ -158,7 +158,7 @@
     },
     "packages/console/app": {
       "name": "@orchium/console-app",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@cloudflare/vite-plugin": "1.15.2",
         "@ibm/plex": "6.4.1",
@@ -195,7 +195,7 @@
     },
     "packages/console/core": {
       "name": "@orchium/console-core",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@aws-sdk/client-sts": "3.782.0",
         "@jsx-email/render": "1.1.1",
@@ -222,7 +222,7 @@
     },
     "packages/console/function": {
       "name": "@orchium/console-function",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@ai-sdk/anthropic": "3.0.82",
         "@ai-sdk/openai": "3.0.48",
@@ -245,7 +245,7 @@
     },
     "packages/console/mail": {
       "name": "@orchium/console-mail",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@jsx-email/all": "2.2.3",
         "@jsx-email/cli": "1.4.3",
@@ -269,7 +269,7 @@
     },
     "packages/console/support": {
       "name": "@orchium/console-support",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@cloudflare/vite-plugin": "1.15.2",
         "@orchium/console-core": "workspace:*",
@@ -289,7 +289,7 @@
     },
     "packages/core": {
       "name": "@orchium/core",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "bin": {
         "orchium": "./bin/orchium",
       },
@@ -383,7 +383,7 @@
     },
     "packages/desktop": {
       "name": "@orchium/desktop",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@zip.js/zip.js": "2.7.62",
         "drizzle-orm": "catalog:",
@@ -437,7 +437,7 @@
     },
     "packages/effect-drizzle-sqlite": {
       "name": "@orchium/effect-drizzle-sqlite",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
@@ -451,7 +451,7 @@
     },
     "packages/effect-sqlite-node": {
       "name": "@orchium/effect-sqlite-node",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -463,7 +463,7 @@
     },
     "packages/enterprise": {
       "name": "@orchium/enterprise",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@hono/standard-validator": "catalog:",
         "@orchium/core": "workspace:*",
@@ -495,7 +495,7 @@
     },
     "packages/function": {
       "name": "@orchium/function",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@octokit/auth-app": "8.0.1",
         "@octokit/rest": "catalog:",
@@ -511,7 +511,7 @@
     },
     "packages/http-recorder": {
       "name": "@orchium/http-recorder",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@effect/platform-node": "4.0.0-beta.83",
         "@effect/platform-node-shared": "4.0.0-beta.83",
@@ -542,7 +542,7 @@
     },
     "packages/llm": {
       "name": "@orchium/llm",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@orchium/schema": "workspace:*",
         "@smithy/eventstream-codec": "4.2.14",
@@ -561,7 +561,7 @@
     },
     "packages/orchium": {
       "name": "orchium",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "bin": {
         "orchium": "./bin/orchium",
       },
@@ -692,7 +692,7 @@
     },
     "packages/plugin": {
       "name": "@orchium/plugin",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@ai-sdk/provider": "3.0.8",
         "@orchium/sdk": "workspace:*",
@@ -768,7 +768,7 @@
     },
     "packages/sdk/js": {
       "name": "@orchium/sdk",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "cross-spawn": "catalog:",
       },
@@ -783,7 +783,7 @@
     },
     "packages/server": {
       "name": "@orchium/server",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@orchium/core": "workspace:*",
         "@orchium/protocol": "workspace:*",
@@ -798,7 +798,7 @@
     },
     "packages/session-ui": {
       "name": "@orchium/session-ui",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@kobalte/core": "catalog:",
         "@orchium/client": "file:../app/vendor/orchium-client-1.17.13-v2.tgz",
@@ -838,7 +838,7 @@
     },
     "packages/slack": {
       "name": "@orchium/slack",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@orchium/sdk": "workspace:*",
         "@slack/bolt": "^3.17.1",
@@ -851,7 +851,7 @@
     },
     "packages/stats/app": {
       "name": "@orchium/stats-app",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@ibm/plex": "6.4.1",
         "@kobalte/core": "catalog:",
@@ -878,7 +878,7 @@
     },
     "packages/stats/core": {
       "name": "@orchium/stats-core",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@aws-sdk/client-athena": "3.933.0",
         "@planetscale/database": "1.19.0",
@@ -897,7 +897,7 @@
     },
     "packages/stats/server": {
       "name": "@orchium/stats-server",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@aws-sdk/client-firehose": "3.933.0",
         "@effect/platform-node": "catalog:",
@@ -939,7 +939,7 @@
     },
     "packages/tui": {
       "name": "@orchium/tui",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@opentui/core": "catalog:",
         "@opentui/keymap": "catalog:",
@@ -966,7 +966,7 @@
     },
     "packages/ui": {
       "name": "@orchium/ui",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@kobalte/core": "catalog:",
         "@pierre/diffs": "catalog:",
@@ -1017,7 +1017,7 @@
     },
     "packages/web": {
       "name": "@orchium/web",
-      "version": "1.18.30",
+      "version": "1.0.0",
       "dependencies": {
         "@astrojs/cloudflare": "12.6.3",
         "@astrojs/markdown-remark": "6.3.1",

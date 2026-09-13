@@ -2,7 +2,7 @@
   "name": "orchium",
   "displayName": "orchium",
   "description": "orchium for VS Code",
-  "version": "1.18.30",
+  "version": "1.0.0",
   "publisher": "sst-dev",
   "repository": {
     "type": "git",
