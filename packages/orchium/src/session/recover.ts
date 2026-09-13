@@ -3,6 +3,7 @@ export * as SessionRecover from "./recover"
 import { sql } from "drizzle-orm"
 import { Effect, Layer } from "effect"
 import { Database } from "@orchium/core/database/database"
+import { LayerNode } from "@orchium/core/effect/layer-node"
 import { MessageTable } from "@orchium/core/session/sql"
 
 /**
@@ -73,3 +74,9 @@ export const recoverStuck = Effect.fn("Session.recoverStuck")(function* () {
 })
 
 export const startupLayer = Layer.effectDiscard(recoverStuck().pipe(Effect.asVoid))
+
+export const node = LayerNode.make({
+  name: "recover",
+  layer: startupLayer,
+  deps: [Database.node],
+})
