@@ -19,7 +19,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-cli:
+    runs-on: ubuntu-latest
+    env:
+      ORCHIUM_CHANNEL: prod
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Resolve version and release tag
+        id: version
+        shell: bash
+        run: |
+          TAG="${{ inputs.release }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.ref_name }}"; fi
+          TAG="${TAG#refs/tags/}"
+          echo "release_tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "release_version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/setup-bun
+
+      - name: Build orchium TUI binaries and upload to release
+        run: ./packages/orchium/script/build.ts
+        env:
+          ORCHIUM_VERSION: ${{ steps.version.outputs.release_version }}
+          ORCHIUM_RELEASE: "true"
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+
+  build-desktop:
     strategy:
       fail-fast: false
       matrix:
