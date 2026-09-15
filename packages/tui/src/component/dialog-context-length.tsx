@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js"
+import { createMemo, onMount } from "solid-js"
 import { DialogModel } from "./dialog-model"
 import { useSync } from "../context/sync"
 import { DialogSelect } from "../ui/dialog-select"
@@ -19,6 +19,8 @@ export function DialogContextLength(props: { providerID: string; modelID: string
   const sync = useSync()
   const dialog = useDialog()
   const toast = useToast()
+
+  onMount(() => dialog.setSize("large"))
 
   const reported = createMemo(() => {
     const provider = sync.data.provider.find((provider) => provider.id === props.providerID)
