@@ -4,6 +4,7 @@ import { map, pipe, flatMap, entries, filter, sortBy, take } from "remeda"
 import { DialogSelect } from "../ui/dialog-select"
 import { useDialog } from "../ui/dialog"
 import { createDialogProviderOptions, DialogProvider } from "./dialog-provider"
+import { DialogContextLength } from "./dialog-context-length"
 import { DialogVariant } from "./dialog-variant"
 import * as fuzzysort from "fuzzysort"
 import { useConnected } from "./use-connected"
@@ -171,6 +172,15 @@ export function DialogModel(props: { providerID?: string }) {
           hidden: !connected(),
           onTrigger: (option) => {
             local.model.toggleFavorite(option.value as { providerID: string; modelID: string })
+          },
+        },
+        {
+          command: "model.dialog.context",
+          title: "Context length",
+          hidden: !connected(),
+          onTrigger: (option) => {
+            const { providerID, modelID } = option.value as { providerID: string; modelID: string }
+            dialog.replace(() => <DialogContextLength providerID={providerID} modelID={modelID} />)
           },
         },
       ]}
