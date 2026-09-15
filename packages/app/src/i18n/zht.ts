@@ -226,6 +226,9 @@ export const dict = {
   "dialog.model.manage": "管理模型",
   "dialog.model.manage.description": "自訂模型選擇器中顯示的模型。",
   "dialog.model.manage.provider.toggle": "切換所有 {{provider}} 模型",
+  "dialog.model.manage.context.label": "上下文長度",
+  "dialog.model.manage.context.placeholder": "上下文長度",
+  "dialog.model.manage.context.aria": "{{model}} 的上下文長度",
 
   "dialog.model.unpaid.freeModels.title": "Orchium 提供的免費模型",
   "dialog.model.unpaid.addMore.title": "從熱門提供者新增更多模型",

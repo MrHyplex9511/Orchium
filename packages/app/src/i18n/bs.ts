@@ -224,6 +224,9 @@ export const dict = {
   "dialog.model.manage": "Upravljaj modelima",
   "dialog.model.manage.description": "Prilagodi koji se modeli prikazuju u izborniku modela.",
   "dialog.model.manage.provider.toggle": "Uključi/isključi sve {{provider}} modele",
+  "dialog.model.manage.context.label": "Dužina konteksta",
+  "dialog.model.manage.context.placeholder": "Dužina konteksta",
+  "dialog.model.manage.context.aria": "Dužina konteksta za {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "Besplatni modeli koje obezbjeđuje Orchium",
   "dialog.model.unpaid.addMore.title": "Dodaj još modela od popularnih provajdera",

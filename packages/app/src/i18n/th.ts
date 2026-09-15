@@ -222,6 +222,9 @@ export const dict = {
   "dialog.model.manage": "จัดการโมเดล",
   "dialog.model.manage.description": "ปรับแต่งโมเดลที่จะปรากฏในตัวเลือกโมเดล",
   "dialog.model.manage.provider.toggle": "สลับโมเดลทั้งหมดของ {{provider}}",
+  "dialog.model.manage.context.label": "ความยาวบริบท",
+  "dialog.model.manage.context.placeholder": "ความยาวบริบท",
+  "dialog.model.manage.context.aria": "ความยาวบริบทของ {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "โมเดลฟรีที่จัดหาให้โดย Orchium",
   "dialog.model.unpaid.addMore.title": "เพิ่มโมเดลเพิ่มเติมจากผู้ให้บริการยอดนิยม",

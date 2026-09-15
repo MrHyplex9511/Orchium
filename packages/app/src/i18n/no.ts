@@ -222,6 +222,9 @@ export const dict = {
   "dialog.model.manage": "Administrer modeller",
   "dialog.model.manage.description": "Tilpass hvilke modeller som vises i modellvelgeren.",
   "dialog.model.manage.provider.toggle": "Veksle alle {{provider}}-modeller",
+  "dialog.model.manage.context.label": "Kontekstlengde",
+  "dialog.model.manage.context.placeholder": "Kontekstlengde",
+  "dialog.model.manage.context.aria": "Kontekstlengde for {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "Gratis modeller levert av Orchium",
   "dialog.model.unpaid.addMore.title": "Legg til flere modeller fra populære leverandører",

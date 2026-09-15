@@ -224,6 +224,9 @@ export const dict = {
   "dialog.model.manage": "Gestionar modelos",
   "dialog.model.manage.description": "Personalizar qué modelos aparecen en el selector de modelos.",
   "dialog.model.manage.provider.toggle": "Mostrar u ocultar todos los modelos de {{provider}}",
+  "dialog.model.manage.context.label": "Longitud del contexto",
+  "dialog.model.manage.context.placeholder": "Longitud del contexto",
+  "dialog.model.manage.context.aria": "Longitud del contexto para {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "Modelos gratuitos proporcionados por Orchium",
   "dialog.model.unpaid.addMore.title": "Añadir más modelos de proveedores populares",

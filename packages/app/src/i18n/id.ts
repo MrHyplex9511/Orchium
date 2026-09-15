@@ -224,6 +224,9 @@ export const dict = {
   "dialog.model.manage": "Kelola model",
   "dialog.model.manage.description": "Sesuaikan model mana yang muncul di pemilih model.",
   "dialog.model.manage.provider.toggle": "Alihkan semua model {{provider}}",
+  "dialog.model.manage.context.label": "Panjang konteks",
+  "dialog.model.manage.context.placeholder": "Panjang konteks",
+  "dialog.model.manage.context.aria": "Panjang konteks untuk {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "Model gratis disediakan oleh Orchium",
   "dialog.model.unpaid.addMore.title": "Tambahkan lebih banyak model dari penyedia populer",

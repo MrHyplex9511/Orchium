@@ -20,9 +20,13 @@ import { DialogConnectProvider } from "./dialog-connect-provider"
 import { decode64 } from "@/utils/base64"
 import { SettingsListV2 } from "./settings-v2/parts/list"
 import { SettingsRowV2 } from "./settings-v2/parts/row"
+import { useServerSync } from "@/context/server-sync"
 import "./settings-v2/settings-v2.css"
 
 type ModelItem = ReturnType<ReturnType<typeof useLocal>["model"]["list"]>[number]
+
+const CONTEXT_LIMIT_MIN = 200_000
+const CONTEXT_LIMIT_MAX = 1_000_000
 
 export const DialogManageModels: Component = () => {
   const local = useLocal()
@@ -120,6 +124,7 @@ export const DialogManageModelsV2: Component = () => {
   const local = useLocal()
   const language = useLanguage()
   const dialog = useDialog()
+  const serverSync = useServerSync()
   const directory = () => decode64(local.slug())
 
   const handleConnectProvider = () => {
@@ -135,6 +140,43 @@ export const DialogManageModelsV2: Component = () => {
   }
   const setModelVisibility = (item: ModelItem, checked: boolean) => {
     local.model.setVisibility({ modelID: item.id, providerID: item.provider.id }, checked)
+  }
+  const contextReported = (item: ModelItem) =>
+    item.limit?.context && item.limit.context > 0 ? item.limit.context : undefined
+  const contextOverride = (item: ModelItem) =>
+    serverSync().data.config.provider?.[item.provider.id]?.models?.[item.id]?.limit?.context
+  const contextDisplay = (item: ModelItem) => contextOverride(item) ?? contextReported(item) ?? ""
+  const writeContext = (item: ModelItem, context: number) => {
+    const configured = serverSync().data.config.provider?.[item.provider.id]?.models?.[item.id]?.limit
+    void serverSync().updateConfig({
+      provider: {
+        [item.provider.id]: {
+          models: {
+            [item.id]: {
+              limit: {
+                context,
+                output: configured?.output ?? item.limit?.output ?? 0,
+                input: configured?.input,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+  const setContextOverride = (item: ModelItem, raw: string) => {
+    const current = contextOverride(item)
+    if (raw.trim() === "") {
+      const reported = contextReported(item)
+      if (reported === undefined || reported === current) return
+      writeContext(item, reported)
+      return
+    }
+    const parsed = Number.parseInt(raw, 10)
+    if (!Number.isFinite(parsed)) return
+    const clamped = Math.min(Math.max(parsed, CONTEXT_LIMIT_MIN), CONTEXT_LIMIT_MAX)
+    if (clamped === current || (current === undefined && clamped === contextReported(item))) return
+    writeContext(item, clamped)
   }
   const list = useFilteredList<ModelItem>({
     items: () => local.model.list(),
@@ -239,7 +281,25 @@ export const DialogManageModelsV2: Component = () => {
                         <For each={group.items}>
                           {(item) => (
                             <SettingsRowV2 title={item.name} description="">
-                              <div>
+                              <div class="flex items-center gap-2.5">
+                                <label class="text-12-medium text-text-weak whitespace-nowrap">
+                                  {language.t("dialog.model.manage.context.label")}
+                                </label>
+                                <TextInputV2
+                                  type="number"
+                                  numeric
+                                  appearance="base"
+                                  class="w-28 shrink-0"
+                                  min={CONTEXT_LIMIT_MIN}
+                                  max={CONTEXT_LIMIT_MAX}
+                                  value={contextDisplay(item)}
+                                  onChange={(event) => setContextOverride(item, event.currentTarget.value)}
+                                  placeholder={language.t("dialog.model.manage.context.placeholder")}
+                                  aria-label={language.t("dialog.model.manage.context.aria", { model: item.name })}
+                                  showClearButton
+                                  clearLabel={language.t("common.clear")}
+                                  onClearClick={() => setContextOverride(item, "")}
+                                />
                                 <SwitchV2
                                   checked={local.model.visible({ modelID: item.id, providerID: item.provider.id })}
                                   onChange={(checked) => setModelVisibility(item, checked)}

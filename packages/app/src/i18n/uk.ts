@@ -224,6 +224,9 @@ export const dict = {
   "dialog.model.manage": "Керувати моделями",
   "dialog.model.manage.description": "Налаштуйте, які моделі відображатимуться у виборі моделей.",
   "dialog.model.manage.provider.toggle": "Перемкнути всі моделі {{provider}}",
+  "dialog.model.manage.context.label": "Довжина контексту",
+  "dialog.model.manage.context.placeholder": "Довжина контексту",
+  "dialog.model.manage.context.aria": "Довжина контексту для {{model}}",
 
   "dialog.model.unpaid.freeModels.title": "Безкоштовні моделі від Orchium",
   "dialog.model.unpaid.addMore.title": "Додати більше моделей від популярних провайдерів",

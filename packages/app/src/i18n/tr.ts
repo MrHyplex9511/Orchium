@@ -228,6 +228,9 @@ export const dict = {
   "dialog.model.manage": "Modelleri yönet",
   "dialog.model.manage.description": "Model seçicide hangi modellerin görüneceğini özelleştirin.",
   "dialog.model.manage.provider.toggle": "Tüm {{provider}} modellerini aç/kapat",
+  "dialog.model.manage.context.label": "Bağlam uzunluğu",
+  "dialog.model.manage.context.placeholder": "Bağlam uzunluğu",
+  "dialog.model.manage.context.aria": "{{model}} için bağlam uzunluğu",
 
   "dialog.model.unpaid.freeModels.title": "Orchium tarafından sunulan ücretsiz modeller",
   "dialog.model.unpaid.addMore.title": "Popüler sağlayıcılardan daha fazla model ekleyin",
