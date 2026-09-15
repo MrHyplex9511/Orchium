@@ -205,6 +205,22 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         options: ok ? {} : { apiKey: "public" },
       }
     }),
+    qwen: Effect.fnUntraced(function* (input: Info) {
+      // The @ai-sdk/alibaba SDK reads ALIBABA_API_KEY as its process env fallback,
+      // which users won't set. Resolve the key from the provider's published env
+      // vars so QWEN_API_KEY / DASHSCOPE_API_KEY reach createAlibaba({ apiKey }).
+      const env = yield* dep.env()
+      const apiKey = iife(() => {
+        for (const item of input.env) {
+          if (env[item]) return env[item]
+        }
+        return undefined
+      })
+      return {
+        autoload: Boolean(apiKey),
+        options: apiKey ? { apiKey } : {},
+      }
+    }),
     openai: () =>
       Effect.succeed({
         autoload: false,
@@ -1529,6 +1545,38 @@ function modelSuggestions(provider: Info | undefined, modelID: ModelV2.ID, enabl
     .map((item) => item.id)
 }
 
+function qwenModel(modelID: string, name: string, opts: { reasoning?: boolean; image?: boolean } = {}): Model {
+  const reasoning = opts.reasoning ?? false
+  const image = opts.image ?? false
+  return {
+    id: ModelV2.ID.make(modelID),
+    providerID: ProviderV2.ID.make("qwen"),
+    name,
+    family: "qwen",
+    api: {
+      id: modelID,
+      npm: "@ai-sdk/alibaba",
+      url: "",
+    },
+    status: "active",
+    headers: {},
+    options: {},
+    cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+    limit: { context: 128000, output: 8192 },
+    capabilities: {
+      temperature: true,
+      reasoning,
+      attachment: image,
+      toolcall: true,
+      input: { text: true, audio: false, image, video: false, pdf: false },
+      output: { text: true, audio: false, image: false, video: false, pdf: false },
+      interleaved: reasoning ? { field: "reasoning_content" } : false,
+    },
+    release_date: "",
+    variants: {},
+  }
+}
+
 const layer = Layer.effect(
   Service,
   Effect.gen(function* () {
@@ -1570,6 +1618,33 @@ const layer = Layer.effect(
             env: [],
             options: {},
             models: {},
+          }
+        }
+        // Qwen (DashScope) is not in the models.dev catalog for the native
+        // @ai-sdk/alibaba npm, so seed it like the local providers. The env-key
+        // loop below activates it automatically when QWEN_API_KEY or
+        // DASHSCOPE_API_KEY is set.
+        if (!database[ProviderV2.ID.make("qwen")]) {
+          database[ProviderV2.ID.make("qwen")] = {
+            id: ProviderV2.ID.make("qwen"),
+            name: "Qwen (DashScope)",
+            source: "custom",
+            env: ["QWEN_API_KEY", "DASHSCOPE_API_KEY"],
+            options: {},
+            models: {
+              "qwen-turbo": qwenModel("qwen-turbo", "Qwen Turbo"),
+              "qwen-plus": qwenModel("qwen-plus", "Qwen Plus"),
+              "qwen-max": qwenModel("qwen-max", "Qwen Max"),
+              "qwen3-coder-plus": qwenModel("qwen3-coder-plus", "Qwen3 Coder Plus"),
+              "qwen3-coder-turbo": qwenModel("qwen3-coder-turbo", "Qwen3 Coder Turbo"),
+              "qwen3-235b-a22b": qwenModel("qwen3-235b-a22b", "Qwen3 235B", { reasoning: true }),
+              "qwen3-32b": qwenModel("qwen3-32b", "Qwen3 32B", { reasoning: true }),
+              "qwen3.5-397b-a17b": qwenModel("qwen3.5-397b-a17b", "Qwen3.5 397B"),
+              "qwen3.6-plus": qwenModel("qwen3.6-plus", "Qwen3.6 Plus"),
+              "qwen-vl-max": qwenModel("qwen-vl-max", "Qwen VL Max", { image: true }),
+              "qwen-vl-plus": qwenModel("qwen-vl-plus", "Qwen VL Plus", { image: true }),
+              "qwq-32b": qwenModel("qwq-32b", "QwQ 32B", { reasoning: true }),
+            },
           }
         }
 
