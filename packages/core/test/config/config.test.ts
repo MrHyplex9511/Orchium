@@ -341,6 +341,10 @@ describe("Config", () => {
                   keep: { tokens: 2000 },
                   buffer: 10000,
                 },
+                event: {
+                  compress_after_days: 60,
+                  retention_days: 7,
+                },
                 skills: ["./skills", "~/shared-skills", "https://example.com/.well-known/skills/"],
                 instructions: ["CONTRIBUTING.md", ".cursor/rules/*.md", "https://example.com/shared-rules.md"],
                 references: {
@@ -426,6 +430,10 @@ describe("Config", () => {
               prune: false,
               keep: { tokens: 2000 },
               buffer: 10000,
+            })
+            expect(documents[0]?.info.event).toEqual({
+              compress_after_days: 60,
+              retention_days: 7,
             })
             expect(documents[0]?.info.skills).toEqual([
               "./skills",

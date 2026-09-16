@@ -11,6 +11,7 @@ import { SessionExecution } from "@orchium/core/session/execution"
 import { LocationServiceMap } from "@orchium/core/location-service-map"
 import { SessionExecutionLocal } from "@orchium/core/session/execution/local"
 import { ToolOutputStore } from "@orchium/core/tool-output-store"
+import { EventMaintain } from "@orchium/core/event/maintain"
 import { HttpRouter, HttpServer } from "effect/unstable/http"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { Layer, Option } from "effect"
@@ -28,6 +29,7 @@ const applicationServices = LayerNode.group([
   EventV2.node,
   httpClient,
   ToolOutputStore.cleanupNode,
+  EventMaintain.maintainNode,
   SessionV2.node,
   PermissionSaved.node,
   PtyTicket.node,

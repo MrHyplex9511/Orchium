@@ -6,6 +6,7 @@ import type { Data, Definition, Payload } from "@orchium/schema/event"
 import { and, asc, eq, gt, inArray } from "drizzle-orm"
 import { Database } from "./database/database"
 import { EventSequenceTable, EventTable } from "./event/sql"
+import { EventCodec } from "./event/codec"
 import { Location } from "./location"
 import { makeGlobalNode } from "./effect/app-node"
 import { isDeepStrictEqual } from "node:util"
@@ -98,7 +99,7 @@ export const readAggregate = Effect.fn("EventV2.readAggregate")(function* <A>(
         seq: event.seq,
         version: input.manifest.definitions.get(event.type)?.durable?.version,
       },
-      data: event.data,
+      data: EventCodec.decode(event.data),
     }),
   )
   return {
@@ -269,7 +270,7 @@ export const layerWith = (options?: LayerOptions) =>
                             if (
                               stored?.id === event.id &&
                               stored.type === versionedType(definition.type, durable.version) &&
-                              isDeepStrictEqual(stored.data, encoded)
+                              isDeepStrictEqual(EventCodec.decode(stored.data), encoded)
                             ) {
                               if (input.ownerID && row?.ownerID == null) {
                                 yield* db
@@ -341,7 +342,7 @@ export const layerWith = (options?: LayerOptions) =>
                                 aggregate_id: aggregateID,
                                 seq,
                                 type: versionedType(definition.type, durable.version),
-                                data: encoded,
+                                data: EventCodec.encode(encoded),
                               },
                             ])
                             .run()
@@ -556,7 +557,7 @@ export const layerWith = (options?: LayerOptions) =>
                 aggregateID: event.aggregate_id,
                 seq: event.seq,
                 type: event.type,
-                data: event.data,
+                data: EventCodec.decode(event.data),
               }),
             ),
           ),
