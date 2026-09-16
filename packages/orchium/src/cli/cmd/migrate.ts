@@ -10,21 +10,22 @@ import { UI } from "../ui"
 
 const legacyHome = () => path.join(os.homedir(), ".opencode")
 const legacyConfig = () => path.join(os.homedir(), ".config", "opencode")
+const legacyData = () => path.join(os.homedir(), ".local", "share", "opencode")
 const flagFile = () => path.join(Global.Path.config, ".migration-complete")
 
 export function checkForLegacyOpencode(): boolean {
-  return fsSync.existsSync(legacyHome()) || fsSync.existsSync(legacyConfig())
+  return fsSync.existsSync(legacyHome()) || fsSync.existsSync(legacyConfig()) || fsSync.existsSync(legacyData())
 }
 
 export function shouldShowMigrationNotice(): boolean {
   return checkForLegacyOpencode() && !fsSync.existsSync(flagFile())
 }
 
-const NOTICE = `Detected a legacy OpenCode installation at ~/.opencode
+const NOTICE = `Detected a legacy OpenCode installation.
 
 Orchium can migrate your:
+  • Session history (from ~/.local/share/opencode)
   • Configuration (agents, MCP servers, permissions)
-  • Session history
   • Skills and instructions
 
 Run \`orchium migrate\` to migrate, or \`orchium migrate --skip\` to dismiss.`
@@ -51,9 +52,43 @@ async function copyEntry(source: string, target: string, copied: string[], skipp
   copied.push(target)
 }
 
+async function copyDatabase(sourceDir: string, copied: string[], skipped: string[]) {
+  const targetDir = Global.Path.data
+  await fs.mkdir(targetDir, { recursive: true })
+
+  // WAL-mode SQLite DB: copy the main file + WAL + SHM for consistency.
+  const entries = [
+    { source: "opencode.db", target: "orchium.db" },
+    { source: "opencode.db-wal", target: "orchium.db-wal" },
+    { source: "opencode.db-shm", target: "orchium.db-shm" },
+  ]
+
+  for (const entry of entries) {
+    const sourcePath = path.join(sourceDir, entry.source)
+    const targetPath = path.join(targetDir, entry.target)
+    if (!fsSync.existsSync(sourcePath)) continue
+    if (fsSync.existsSync(targetPath)) {
+      skipped.push(targetPath)
+      continue
+    }
+    UI.println(`  Copying ${entry.source}...`)
+    await fs.copyFile(sourcePath, targetPath)
+    copied.push(targetPath)
+  }
+}
+
 export async function migrate() {
   const copied: string[] = []
   const skipped: string[] = []
+
+  // Session history — copy the database from legacy data directory.
+  const dataDir = legacyData()
+  if (fsSync.existsSync(dataDir)) {
+    UI.println("Migrating session history...")
+    await copyDatabase(dataDir, copied, skipped)
+  }
+
+  // Configuration files.
   const jobs: Array<{ source: string; target: string }> = [
     { source: path.join(legacyConfig(), "opencode.json"), target: path.join(Global.Path.config, "orchium.json") },
     { source: path.join(legacyConfig(), "opencode.jsonc"), target: path.join(Global.Path.config, "orchium.jsonc") },
@@ -64,6 +99,12 @@ export async function migrate() {
   for (const job of jobs) {
     if (!fsSync.existsSync(job.source)) continue
     await copyEntry(job.source, job.target, copied, skipped)
+  }
+
+  // Legacy home directory (very old installs).
+  if (fsSync.existsSync(legacyHome())) {
+    await copyEntry(path.join(legacyHome(), "opencode.json"), path.join(Global.Path.config, "orchium.json"), copied, skipped)
+    await copyEntry(path.join(legacyHome(), "opencode.jsonc"), path.join(Global.Path.config, "orchium.jsonc"), copied, skipped)
   }
 
   await fs.mkdir(Global.Path.config, { recursive: true })
