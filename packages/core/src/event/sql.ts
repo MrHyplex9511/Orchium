@@ -16,7 +16,7 @@ export const EventTable = sqliteTable(
       .references(() => EventSequenceTable.aggregate_id, { onDelete: "cascade" }),
     seq: integer().notNull(),
     type: text().notNull(),
-    data: text({ mode: "json" }).$type<Record<string, unknown>>().notNull(),
+    data: text().notNull(),
   },
   (table) => [
     uniqueIndex("event_aggregate_seq_idx").on(table.aggregate_id, table.seq),

@@ -13,6 +13,7 @@ import { Auth } from "@/auth"
 import { EventV2 } from "@orchium/core/event"
 import { EventV2Bridge } from "@/event-v2-bridge"
 import { EventSequenceTable, EventTable } from "@orchium/core/event/sql"
+import { EventCodec } from "@orchium/core/event/codec"
 import { FSUtil } from "@orchium/core/fs-util"
 import { RuntimeFlags } from "@/effect/runtime-flags"
 import { ProjectV2 } from "@orchium/core/project"
@@ -661,7 +662,8 @@ const layer = Layer.effect(
             sessionID: input.sessionID,
           })
 
-        const batches = Iterable.chunksOf(rows, 10)
+        const decodedRows = rows.map((row) => ({ ...row, data: EventCodec.decode(row.data) }))
+        const batches = Iterable.chunksOf(decodedRows, 10)
         const total = Iterable.size(batches)
 
         yield* Effect.forEach(

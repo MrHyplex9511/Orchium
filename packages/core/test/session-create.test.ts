@@ -8,6 +8,7 @@ import { AppNodeBuilder } from "@orchium/core/effect/app-node-builder"
 import { LayerNode } from "@orchium/core/effect/layer-node"
 import { EventV2 } from "@orchium/core/event"
 import { EventTable } from "@orchium/core/event/sql"
+import { EventCodec } from "@orchium/core/event/codec"
 import { Location } from "@orchium/core/location"
 import { ModelV2 } from "@orchium/core/model"
 import { ProjectV2 } from "@orchium/core/project"
@@ -182,9 +183,13 @@ describe("SessionV2.create", () => {
       const { db } = yield* Database.Service
       const created = yield* session.create({ id, location })
 
-      expect(
-        yield* db.select().from(EventTable).where(eq(EventTable.aggregate_id, created.id)).get().pipe(Effect.orDie),
-      ).toMatchObject({
+      const row = yield* db
+        .select()
+        .from(EventTable)
+        .where(eq(EventTable.aggregate_id, created.id))
+        .get()
+        .pipe(Effect.orDie)
+      expect({ ...row, data: EventCodec.decode(row!.data) }).toMatchObject({
         data: { sessionID: id },
       })
     }),
@@ -231,7 +236,7 @@ describe("SessionV2.create", () => {
         aggregateID: event.aggregate_id,
         seq: event.seq,
         type: event.type,
-        data: event.data,
+        data: EventCodec.decode(event.data),
       }))
 
       const tmp = yield* Effect.acquireRelease(

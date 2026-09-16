@@ -5,6 +5,7 @@ import { Database } from "@orchium/core/database/database"
 import { EventV2 } from "@orchium/core/event"
 import { EventV2Bridge } from "@/event-v2-bridge"
 import { EventTable } from "@orchium/core/event/sql"
+import { EventCodec } from "@orchium/core/event/codec"
 import { asc } from "drizzle-orm"
 import { and } from "drizzle-orm"
 import { eq } from "drizzle-orm"
@@ -71,7 +72,7 @@ export const syncHandlers = HttpApiBuilder.group(InstanceHttpApi, "sync", (handl
 
     const history = Effect.fn("SyncHttpApi.history")(function* (ctx: { payload: typeof HistoryPayload.Type }) {
       const exclude = Object.entries(ctx.payload)
-      return yield* db
+      const rows = yield* db
         .select()
         .from(EventTable)
         .where(
@@ -82,6 +83,7 @@ export const syncHandlers = HttpApiBuilder.group(InstanceHttpApi, "sync", (handl
         .orderBy(asc(EventTable.seq))
         .all()
         .pipe(Effect.orDie)
+      return rows.map((row) => ({ ...row, data: EventCodec.decode(row.data) }))
     })
 
     return handlers.handle("start", start).handle("replay", replay).handle("steal", steal).handle("history", history)

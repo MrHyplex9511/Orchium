@@ -6,6 +6,7 @@ import { AppNodeBuilder } from "@orchium/core/effect/app-node-builder"
 import { LayerNode } from "@orchium/core/effect/layer-node"
 import { EventV2 } from "@orchium/core/event"
 import { EventTable } from "@orchium/core/event/sql"
+import { EventCodec } from "@orchium/core/event/codec"
 import { SessionEvent } from "@orchium/core/session/event"
 import { Project } from "@orchium/core/project"
 import { ProjectTable } from "@orchium/core/project/sql"
@@ -433,7 +434,7 @@ describe("SessionV2.prompt", () => {
           aggregateID: event.aggregate_id,
           seq: event.seq,
           type: event.type,
-          data: event.data,
+          data: EventCodec.decode(event.data),
         })),
       )
 

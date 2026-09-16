@@ -18,6 +18,7 @@ import { LayerNode } from "@orchium/core/effect/layer-node"
 import { EventV2 } from "@orchium/core/event"
 import { PermissionV2 } from "@orchium/core/permission"
 import { EventTable } from "@orchium/core/event/sql"
+import { EventCodec } from "@orchium/core/event/codec"
 import { Project } from "@orchium/core/project"
 import { ProjectTable } from "@orchium/core/project/sql"
 import { QuestionV2 } from "@orchium/core/question"
@@ -388,7 +389,7 @@ const replaySessionProjection = (id: SessionV2.ID) =>
         aggregateID: event.aggregate_id,
         seq: event.seq,
         type: event.type,
-        data: event.data,
+        data: EventCodec.decode(event.data),
       })),
     )
   })
