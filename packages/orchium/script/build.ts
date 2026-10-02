@@ -3,7 +3,6 @@
 import { $ } from "bun"
 import path from "path"
 import { fileURLToPath } from "url"
-import { createSolidTransformPlugin } from "@opentui/solid/bun-plugin"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -20,7 +19,6 @@ const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
 const sourcemapsFlag = process.argv.includes("--sourcemaps")
-const plugin = createSolidTransformPlugin()
 const skipEmbedWebUi = process.argv.includes("--skip-embed-web-ui")
 
 const createEmbeddedWebUIBundle = async () => {
@@ -161,9 +159,13 @@ for (const item of targets) {
   const bunfsRoot = item.os === "win32" ? "B:/~BUN/root/" : "/$bunfs/root/"
 
   await Bun.build({
-    conditions: ["bun", "node"],
+    // "browser" resolves solid-js to its client build; without it the "worker"/"node"
+    // conditions select dist/server.js and the TUI crashes on startup. "bun" keeps
+    // bun-flavored package variants. JSX itself is compiled natively (tsconfig
+    // jsxImportSource: "@orchium/tui") — the @opentui/solid babel transform was
+    // dropped because it evaluates children eagerly (providers crash before mount).
+    conditions: ["bun", "browser"],
     tsconfig: "./tsconfig.json",
-    plugins: [plugin],
     external: ["node-gyp"],
     format: "esm",
     minify: true,
