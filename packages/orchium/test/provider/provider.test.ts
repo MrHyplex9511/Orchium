@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test"
+import { afterAll, afterEach, expect, test } from "bun:test"
 import { mkdir, unlink } from "fs/promises"
 import path from "path"
 import { LayerNode } from "@orchium/core/effect/layer-node"
@@ -891,6 +891,70 @@ it.instance(
 )
 
 // Edge cases for model configuration
+
+it.instance("llama.cpp provider discovers models from the local server", () =>
+  Effect.gen(function* () {
+    const server = yield* Effect.acquireRelease(
+      Effect.sync(() =>
+        Bun.serve({
+          port: 0,
+          routes: {
+            "/v1/models": () =>
+              Response.json({
+                data: [{ id: "hermes-3-llama-3.2-8b-q4_k_m.gguf", object: "model" }],
+              }),
+          },
+        }),
+      ),
+      (srv) => Effect.sync(() => srv.stop(true)),
+    )
+    yield* set("LLAMA_HOST", `http://127.0.0.1:${server.port}`)
+    const providers = yield* list
+    expect(providers[ProviderV2.ID.llamaCpp]).toBeDefined()
+    expect(providers[ProviderV2.ID.llamaCpp].options.baseURL).toBe(`http://127.0.0.1:${server.port}/v1`)
+    const model = providers[ProviderV2.ID.llamaCpp].models["hermes-3-llama-3.2-8b-q4_k_m.gguf"]
+    expect(model).toBeDefined()
+    expect(model.api.npm).toBe("@ai-sdk/openai-compatible")
+    expect(model.api.url).toBe(`http://127.0.0.1:${server.port}/v1`)
+    expect(model.cost.input).toBe(0)
+    expect(model.capabilities.toolcall).toBe(true)
+  }),
+)
+
+// A module-scope server so the configured baseURL (a static test option) can
+// reference its port; the env-based discovery test above uses its own server.
+const llamaCppServer = Bun.serve({
+  port: 0,
+  routes: {
+    "/v1/models": () => Response.json({ data: [{ id: "configured-model" }] }),
+  },
+})
+afterAll(() => {
+  llamaCppServer.stop(true)
+})
+
+it.instance(
+  "llama.cpp provider configured baseURL wins over LLAMA_HOST for discovery",
+  Effect.gen(function* () {
+    // Point LLAMA_HOST at an unroutable address: with a configured baseURL the
+    // loader must discover from the configured endpoint instead.
+    yield* set("LLAMA_HOST", "http://127.0.0.1:59999")
+    const providers = yield* list
+    expect(providers[ProviderV2.ID.llamaCpp]).toBeDefined()
+    expect(providers[ProviderV2.ID.llamaCpp].options.baseURL).toBe(`http://127.0.0.1:${llamaCppServer.port}/v1`)
+    expect(providers[ProviderV2.ID.llamaCpp].models["configured-model"]).toBeDefined()
+  }),
+  {
+    config: {
+      provider: {
+        "llama-cpp": {
+          name: "llama.cpp (local)",
+          options: { baseURL: `http://127.0.0.1:${llamaCppServer.port}/v1` },
+        },
+      },
+    },
+  },
+)
 
 it.instance(
   "model alias name defaults to alias key when id differs",

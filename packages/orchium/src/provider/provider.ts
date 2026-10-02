@@ -895,6 +895,82 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         },
       }
     }),
+    "llama-cpp": Effect.fnUntraced(function* (input: Info) {
+      const env = yield* dep.env()
+      // A configured baseURL is used verbatim: it already is the OpenAI-compatible
+      // base (llama-server's /v1). LLAMA_HOST overrides the default llama-server
+      // endpoint and gets /v1 appended.
+      const configured = typeof input.options?.baseURL === "string" ? input.options.baseURL : undefined
+      const baseURL = iife(() => {
+        if (configured) return configured.trim().replace(/\/+$/, "")
+        const raw = env["LLAMA_HOST"] ?? "http://127.0.0.1:8080"
+        const trimmed = raw.trim().replace(/\/+$/, "")
+        return `${/^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`}/v1`
+      })
+      return {
+        autoload: true,
+        options: { baseURL },
+        async discoverModels(): Promise<Record<string, Model>> {
+          try {
+            // llama.cpp's llama-server exposes an OpenAI-compatible /v1/models endpoint.
+            const res = await fetch(`${baseURL}/models`, {
+              signal: AbortSignal.timeout(5_000),
+            })
+            if (!res.ok) return {}
+            const data = (await res.json()) as { data?: { id?: string }[] }
+            const models: Record<string, Model> = {}
+            for (const item of data.data ?? []) {
+              const id = item.id
+              if (!id || input.models[id]) continue
+              models[id] = {
+                id: ModelV2.ID.make(id),
+                providerID: ProviderV2.ID.make("llama-cpp"),
+                name: id,
+                family: "",
+                api: {
+                  id,
+                  url: baseURL,
+                  npm: "@ai-sdk/openai-compatible",
+                },
+                status: "active",
+                headers: {},
+                options: {},
+                cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+                // llama.cpp's /v1/models does not report context/output limits; 0 = unknown
+                // (overflow/usage checks treat 0 as "skip").
+                limit: { context: 0, output: 0 },
+                capabilities: {
+                  temperature: true,
+                  reasoning: false,
+                  attachment: false,
+                  toolcall: true,
+                  input: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  output: {
+                    text: true,
+                    audio: false,
+                    image: false,
+                    video: false,
+                    pdf: false,
+                  },
+                  interleaved: false,
+                },
+                release_date: "",
+                variants: {},
+              }
+            }
+            return models
+          } catch (e) {
+            return {}
+          }
+        },
+      }
+    }),
     "cloudflare-workers-ai": Effect.fnUntraced(function* (input: Info) {
       // When baseURL is already configured (e.g. corporate config routing through a proxy/gateway),
       // skip the account ID check because the URL is already fully specified.
@@ -1596,10 +1672,11 @@ const layer = Layer.effect(
         const catalog = mapValues(modelsDev, fromModelsDevProvider)
         const database = mapValues(catalog, toPublicInfo)
 
-        // Local OpenAI-compatible servers (Ollama, LM Studio) are not part of the
-        // models.dev catalog. Seed them so the custom loaders below can register
-        // autoload providers. `env` stays empty: the env-key loop would otherwise
-        // treat OLLAMA_HOST as an API key instead of a base URL.
+        // Local OpenAI-compatible servers (Ollama, LM Studio, llama.cpp) are not
+        // part of the models.dev catalog. Seed them so the custom loaders below
+        // can register autoload providers. `env` stays empty: the env-key loop
+        // would otherwise treat OLLAMA_HOST / LLAMA_HOST as an API key instead
+        // of a base URL.
         if (!database[ProviderV2.ID.make("ollama")]) {
           database[ProviderV2.ID.make("ollama")] = {
             id: ProviderV2.ID.make("ollama"),
@@ -1614,6 +1691,16 @@ const layer = Layer.effect(
           database[ProviderV2.ID.make("lmstudio")] = {
             id: ProviderV2.ID.make("lmstudio"),
             name: "LM Studio (local)",
+            source: "custom",
+            env: [],
+            options: {},
+            models: {},
+          }
+        }
+        if (!database[ProviderV2.ID.make("llama-cpp")]) {
+          database[ProviderV2.ID.make("llama-cpp")] = {
+            id: ProviderV2.ID.make("llama-cpp"),
+            name: "llama.cpp (local)",
             source: "custom",
             env: [],
             options: {},
@@ -1911,7 +1998,11 @@ const layer = Layer.effect(
           })
         }
 
-        for (const localID of [ProviderV2.ID.make("ollama"), ProviderV2.ID.make("lmstudio")]) {
+        for (const localID of [
+          ProviderV2.ID.make("ollama"),
+          ProviderV2.ID.make("lmstudio"),
+          ProviderV2.ID.make("llama-cpp"),
+        ]) {
           if (discoveryLoaders[localID] && providers[localID] && isProviderAllowed(localID)) {
             yield* Effect.promise(async () => {
               try {

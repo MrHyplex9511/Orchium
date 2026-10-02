@@ -21,6 +21,7 @@ export const ID = Schema.String.pipe(
     gitlab: schema.make("gitlab"),
     ollama: schema.make("ollama"),
     lmstudio: schema.make("lmstudio"),
+    llamaCpp: schema.make("llama-cpp"),
   })),
 )
 export type ID = typeof ID.Type

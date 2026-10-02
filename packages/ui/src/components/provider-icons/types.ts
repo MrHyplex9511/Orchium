@@ -55,6 +55,7 @@ export const iconNames = [
   "meganova",
   "lucidquery",
   "lmstudio",
+  "llama-cpp",
   "llama",
   "kuae-cloud-coding-plan",
   "kimi-for-coding",
